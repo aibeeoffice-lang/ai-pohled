@@ -6,6 +6,9 @@ import ArticleFilters from '@/components/ArticleFilters';
 import EmptyState from '@/components/EmptyState';
 import { articles, Level } from '@/data/articles';
 import { getSectionBySlug, SECTIONS } from '@/data/sections';
+import { PRO_PILLARS, ProPillar } from '@/data/pillars';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const SectionPage = () => {
   const { section: sectionSlug } = useParams<{ section: string }>();
@@ -15,10 +18,10 @@ const SectionPage = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
   const [premiumOnly, setPremiumOnly] = useState(false);
+  const [selectedPillar, setSelectedPillar] = useState<ProPillar | 'all'>('all');
 
   // If not a valid section slug, check if it's a special page route
   if (!sectionConfig) {
-    // These are handled by other routes, but if someone navigates to an unknown path
     const specialRoutes = ['prihlaseni', 'ucet', 'newsletter', 'clanek'];
     if (sectionSlug && specialRoutes.some(r => sectionSlug.startsWith(r))) {
       return <Navigate to={`/${sectionSlug}`} replace />;
@@ -40,6 +43,7 @@ const SectionPage = () => {
   }
 
   const section = sectionConfig.sectionKey;
+  const isPro = section === 'PRO';
   const sectionArticles = articles.filter(a => a.section === section);
   
   const allTags = useMemo(() => {
@@ -48,8 +52,22 @@ const SectionPage = () => {
     return Array.from(tags);
   }, [sectionArticles]);
 
+  // Count articles per pillar
+  const pillarCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: sectionArticles.length };
+    PRO_PILLARS.forEach(p => {
+      counts[p.key] = sectionArticles.filter(a => a.proPillar === p.key).length;
+    });
+    return counts;
+  }, [sectionArticles]);
+
   const filteredArticles = useMemo(() => {
     let result = [...sectionArticles];
+    
+    // Pillar filter (PRO only)
+    if (isPro && selectedPillar !== 'all') {
+      result = result.filter(a => a.proPillar === selectedPillar);
+    }
     
     if (selectedLevel !== 'all') {
       result = result.filter(a => a.level === selectedLevel);
@@ -70,7 +88,7 @@ const SectionPage = () => {
     });
     
     return result;
-  }, [sectionArticles, selectedLevel, selectedTags, sortBy, premiumOnly]);
+  }, [sectionArticles, selectedLevel, selectedTags, sortBy, premiumOnly, selectedPillar, isPro]);
 
   const handleTagToggle = (tag: string) => {
     setSelectedTags(prev => 
@@ -81,7 +99,46 @@ const SectionPage = () => {
   return (
     <Layout>
       <div className="container-wide py-8 md:py-12">
-        <h1 className="font-display text-3xl md:text-4xl font-bold mb-8">{sectionConfig.title}</h1>
+        <h1 className="font-display text-3xl md:text-4xl font-bold mb-2">{sectionConfig.title}</h1>
+        
+        {/* PRO intro text */}
+        {isPro && (
+          <p className="text-muted-foreground mb-6">
+            Hloubkové články pro praxi: trh, výzkum, technické postupy a firemní governance. Některý obsah je jen pro přihlášené.
+          </p>
+        )}
+
+        {/* Pillar navigation for PRO */}
+        {isPro && (
+          <div className="mb-6">
+            <div className="text-sm font-medium text-muted-foreground mb-2">Pilíře:</div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={selectedPillar === 'all' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedPillar('all')}
+              >
+                Vše ({pillarCounts.all})
+              </Button>
+              {PRO_PILLARS.map((pillar) => (
+                <Tooltip key={pillar.key}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={selectedPillar === pillar.key ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedPillar(pillar.key)}
+                    >
+                      {pillar.label} ({pillarCounts[pillar.key] || 0})
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">{pillar.description}</p>
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+            </div>
+          </div>
+        )}
         
         <ArticleFilters
           levels={['Začátečník', 'Pokročilý', 'PRO']}
@@ -92,7 +149,7 @@ const SectionPage = () => {
           onTagToggle={handleTagToggle}
           sortBy={sortBy}
           onSortChange={setSortBy}
-          showPremiumOnly={section === 'PRO'}
+          showPremiumOnly={isPro}
           isPremiumFilter={premiumOnly}
           onPremiumFilterChange={setPremiumOnly}
         />

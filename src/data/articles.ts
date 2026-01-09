@@ -1,3 +1,5 @@
+import { ProPillar } from './pillars';
+
 export type Section = 'Novinky' | 'Vysvětleno' | 'Návody' | 'Nástroje' | 'AI v práci' | 'PRO';
 export type Level = 'Začátečník' | 'Pokročilý' | 'PRO';
 
@@ -14,6 +16,7 @@ export interface Article {
   author: string;
   publishedAt: string;
   coverImage?: string;
+  proPillar?: ProPillar;
   whatItMeans?: {
     changed: string;
     important: string;
@@ -639,6 +642,7 @@ export const articles: Article[] = [
   },
 
   // PRO (8 articles, at least 3 premium)
+  // Pillar: Byznys & trh
   {
     id: '31',
     title: 'AI v roce 2026: kdo vydělá, kdo ztratí a co to znamená pro ČR',
@@ -646,6 +650,7 @@ export const articles: Article[] = [
     section: 'PRO',
     level: 'PRO',
     isPremium: true,
+    proPillar: 'Byznys & trh',
     excerpt: 'AI už není hračka pro geeky. V roce 2026 rozhodne o penězích a konkurenceschopnosti to, kdo ji zvládne nasadit do procesů – a kdo zůstane u hezkých demíček.',
     content: [
       'Je snadné zamilovat se do nových modelů a jejich wow efektu. Těžší je udělat z AI skutečný výkon: rychlejší práci, levnější procesy, lepší rozhodování. V roce 2026 se bude lámat chleba – firmy, které AI "přilepí" jen na marketing, budou vypadat moderně. Ty, které ji integrují do obchodu, provozu a řízení, budou moderní doopravdy.',
@@ -664,6 +669,7 @@ export const articles: Article[] = [
     author: 'Jan Svoboda',
     publishedAt: '2026-01-08'
   },
+  // Pillar: Byznys & trh
   {
     id: '32',
     title: 'Jak poznat, že AI projekt fakt funguje: 7 metrik, které nejsou vanity',
@@ -671,6 +677,7 @@ export const articles: Article[] = [
     section: 'PRO',
     level: 'PRO',
     isPremium: false,
+    proPillar: 'Byznys & trh',
     excerpt: 'AI projekt je úspěšný teprve tehdy, když se dá obhájit čísly. Ne počtem promptů, ale dopadem na čas, náklady a kvalitu.',
     content: [
       '## Proč většina AI projektů nedojde dál než „wow demo"\n\nJe snadné udělat impresivní demo. Těžké je dostat AI do produkce a měřit reálný dopad. Většina projektů selže na přechodu z "funguje to" na "vyplatí se to".',
@@ -690,6 +697,7 @@ export const articles: Article[] = [
     author: 'Petra Králová',
     publishedAt: '2026-01-07'
   },
+  // Pillar: Regulace & governance
   {
     id: '33',
     title: 'Enterprise AI governance: jak nastavit pravidla hry',
@@ -697,6 +705,7 @@ export const articles: Article[] = [
     section: 'PRO',
     level: 'PRO',
     isPremium: true,
+    proPillar: 'Regulace & governance',
     excerpt: 'Velké firmy potřebují AI strategii, procesy a governance. Framework pro zodpovědné nasazení.',
     content: [
       'Bez governance je AI jako divoký západ. Každý tým si nasadí, co chce. Data tečou kam nemají. Rizika rostou.',
@@ -713,6 +722,7 @@ export const articles: Article[] = [
     author: 'Jan Svoboda',
     publishedAt: '2026-01-06'
   },
+  // Pillar: Dev & data
   {
     id: '34',
     title: 'AI agents: od chatbotů k autonomním systémům',
@@ -720,6 +730,7 @@ export const articles: Article[] = [
     section: 'PRO',
     level: 'PRO',
     isPremium: false,
+    proPillar: 'Dev & data',
     excerpt: 'AI agenti jsou další evoluce. Systémy, které plánují, rozhodují a jednají samostatně.',
     content: [
       'Chatbot odpovídá na otázky. Agent řeší úkoly. To je klíčový rozdíl.',
@@ -734,6 +745,7 @@ export const articles: Article[] = [
     author: 'Eva Horová',
     publishedAt: '2026-01-05'
   },
+  // Pillar: Regulace & governance
   {
     id: '35',
     title: 'Právní rizika AI: co může firmu stát miliony',
@@ -741,6 +753,7 @@ export const articles: Article[] = [
     section: 'PRO',
     level: 'PRO',
     isPremium: true,
+    proPillar: 'Regulace & governance',
     excerpt: 'Od autorských práv po diskriminaci. Přehled právních rizik a jak je minimalizovat.',
     content: [
       'AI přináší nová právní rizika, která většina firem podcenila. A pokuty rostou.',
@@ -760,6 +773,7 @@ export const articles: Article[] = [
     author: 'Martin Novák',
     publishedAt: '2026-01-04'
   },
+  // Pillar: Byznys & trh (team building is business)
   {
     id: '36',
     title: 'Budování AI týmu: koho najmout a jak',
@@ -767,6 +781,7 @@ export const articles: Article[] = [
     section: 'PRO',
     level: 'PRO',
     isPremium: false,
+    proPillar: 'Byznys & trh',
     excerpt: 'Kompetence, role a struktura pro úspěšný AI tým. Od prvního hire po scale-up.',
     content: [
       'AI projekty selhávají kvůli lidem, ne technologii. Správný tým je základ úspěchu.',
@@ -781,6 +796,7 @@ export const articles: Article[] = [
     author: 'Petra Králová',
     publishedAt: '2026-01-03'
   },
+  // Pillar: Dev & data (security is technical)
   {
     id: '37',
     title: 'AI a bezpečnost: nové hrozby, nové obrany',
@@ -788,6 +804,7 @@ export const articles: Article[] = [
     section: 'PRO',
     level: 'PRO',
     isPremium: false,
+    proPillar: 'Dev & data',
     excerpt: 'AI mění kybernetickou bezpečnost na obou stranách. Co musíte vědět.',
     content: [
       'AI je dvojsečná zbraň. Útočníci ji používají. Obránci také. Kdo bude rychlejší?',
@@ -802,6 +819,7 @@ export const articles: Article[] = [
     author: 'Jan Svoboda',
     publishedAt: '2026-01-02'
   },
+  // Pillar: Byznys & trh
   {
     id: '38',
     title: 'AI ROI kalkulačka: jak obhájit investici',
@@ -809,6 +827,7 @@ export const articles: Article[] = [
     section: 'PRO',
     level: 'PRO',
     isPremium: false,
+    proPillar: 'Byznys & trh',
     excerpt: 'Praktický framework pro výpočet návratnosti AI projektů. S příklady a šablonou.',
     content: [
       'CFO se ptá: "Kolik to stojí a kdy se to vrátí?" Bez dobré odpovědi projekt nedostane budget.',
@@ -823,6 +842,75 @@ export const articles: Article[] = [
     tags: ['ROI', 'finance', 'business case', 'investice'],
     author: 'Eva Horová',
     publishedAt: '2026-01-01'
+  },
+  // Pillar: Výzkum - NEW ARTICLE
+  {
+    id: '39',
+    title: 'Research digest: GPT-5 benchmarky a co z nich plyne',
+    slug: 'research-digest-gpt5-benchmarky',
+    section: 'PRO',
+    level: 'PRO',
+    isPremium: false,
+    proPillar: 'Výzkum',
+    excerpt: 'Přehled nejnovějších benchmarků a výzkumných zjištění o velkých jazykových modelech. Co vyšlo a proč to matters.',
+    content: [
+      'Každý měsíc vychází desítky papers o LLM. Většina je šum. Tady je to podstatné.',
+      '## Nové benchmarky pro reasoning\n\nKlasické benchmarky (MMLU, HellaSwag) už nestačí – modely je "hackují". Nové testy se zaměřují na skutečné uvažování.',
+      '## ARC-AGI a GPQA\n\nARC-AGI testuje abstraktní reasoning na vizuálních puzzlech. GPQA klade PhD-level otázky. GPT-5 dosahuje 85 % na GPQA vs. 70 % u GPT-4.',
+      '## Multimodální schopnosti\n\nNové modely lépe kombinují text, obraz a audio. Gemini 2 a GPT-5 zvládají video understanding a real-time analýzu.',
+      '## Co to znamená pro praxi\n\n- Reasoning úlohy jsou spolehlivější\n- Multimodální use cases jsou reálné\n- Ale: halucinace zůstávají problém\n- Fine-tuning na doménových datech stále pomáhá',
+      '## Klíčové papers k přečtení\n\n1. "Scaling Laws for Transfer" (Anthropic)\n2. "Constitutional AI 2.0" (Anthropic)\n3. "Mixture of Experts at Scale" (Google)\n4. "Long Context Faithfulness" (OpenAI)',
+      '## Doporučení\n\nNehoňte se za nejnovějším modelem. Důležitější je kvalita dat a jasný use case. Nové modely pomohou, ale nezachrání špatný projekt.'
+    ],
+    tags: ['výzkum', 'benchmarky', 'GPT-5', 'papers'],
+    author: 'Jan Svoboda',
+    publishedAt: '2025-12-28'
+  },
+  // Pillar: Výzkum - NEW ARTICLE (Premium)
+  {
+    id: '40',
+    title: 'Emerging research: AI v medicíně 2026',
+    slug: 'vyzkum-ai-medicina-2026',
+    section: 'PRO',
+    level: 'PRO',
+    isPremium: true,
+    proPillar: 'Výzkum',
+    excerpt: 'Přehled průlomových výzkumů v aplikaci AI v medicíně. Od diagnostiky po drug discovery.',
+    content: [
+      'Medicína je oblast, kde AI přináší měřitelné výsledky. Tady jsou nejdůležitější průlomy roku.',
+      '## AlphaFold 3 a protein interactions\n\nNová verze predikuje nejen strukturu proteinů, ale i jejich interakce s léky. Revolucionizuje drug discovery.',
+      '## AI v radiologii\n\nModely dosahují přesnosti srovnatelné s radiology v detekci rakoviny prsu, plic a kůže. FDA schválila první autonomous AI diagnostické systémy.',
+      '## Personalizovaná medicína\n\nAI analyzuje genomická data a navrhuje personalizované léčebné protokoly. Pilotní programy běží v Mayo Clinic a Cleveland Clinic.',
+      '## Klinické studie s AI\n\nAI pomáhá identifikovat vhodné pacienty pro studie a predikovat výsledky. Zkracuje čas vývoje léků o měsíce.',
+      '## Etické otázky\n\n- Kdo je odpovědný za AI diagnózu?\n- Jak zajistit rovný přístup?\n- Transparentnost algoritmů vs. proprietární IP',
+      '## Příležitosti pro české firmy\n\nČeské zdravotnictví má kvalitní data. Příležitost pro startupy v medical AI, pokud zvládnou regulatorní překážky.'
+    ],
+    tags: ['medicína', 'výzkum', 'AlphaFold', 'diagnostika'],
+    author: 'Petra Králová',
+    publishedAt: '2025-12-25'
+  },
+  // Pillar: Dev & data - NEW ARTICLE (Premium)
+  {
+    id: '41',
+    title: 'RAG v produkci: architektura, evaluace a škálování',
+    slug: 'rag-produkce-architektura',
+    section: 'PRO',
+    level: 'PRO',
+    isPremium: true,
+    proPillar: 'Dev & data',
+    excerpt: 'Praktický guide pro nasazení RAG systémů v enterprise prostředí. Od architektury po monitoring.',
+    content: [
+      'RAG je zlatý standard pro enterprise AI. Ale přejít z demo do produkce je těžké. Tady je jak.',
+      '## Architektura RAG systému\n\n**Komponenty:**\n- Document ingestion pipeline\n- Embedding model (OpenAI, Cohere, local)\n- Vector database (Pinecone, Weaviate, Qdrant)\n- Retrieval layer\n- LLM for generation\n- Reranking (optional)',
+      '## Chunking strategies\n\n- Fixed size: jednoduché, ale ztrácí kontext\n- Semantic: lepší kvalita, složitější implementace\n- Hierarchical: kombinuje oba přístupy\n- Doporučení: začněte semantic s overlap',
+      '## Evaluace RAG systémů\n\n**Metriky:**\n- Retrieval precision/recall\n- Answer relevance\n- Faithfulness (groundedness)\n- Latency a cost\n\n**Nástroje:** Ragas, TruLens, LangSmith',
+      '## Škálování\n\n- Horizontal scaling vector DB\n- Caching frequent queries\n- Async processing pro batch\n- Edge deployment pro latency',
+      '## Production checklist\n\n✅ Monitoring retrieval quality\n✅ Logging všech queries a responses\n✅ Fallback pro edge cases\n✅ Regular reindexing pipeline\n✅ Cost alerting\n✅ A/B testing pro improvements',
+      '## Časté chyby\n\n- Příliš velké chunky\n- Ignorování metadata\n- Žádná evaluace\n- Over-engineering od začátku'
+    ],
+    tags: ['RAG', 'architektura', 'MLOps', 'produkce'],
+    author: 'Eva Horová',
+    publishedAt: '2025-12-20'
   }
 ];
 
