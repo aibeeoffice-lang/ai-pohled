@@ -3,24 +3,41 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
+import SectionPage from "./pages/SectionPage";
+import ArticlePage from "./pages/ArticlePage";
+import LoginPage from "./pages/LoginPage";
+import AccountPage from "./pages/AccountPage";
+import NewsletterPage from "./pages/NewsletterPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/novinky" element={<SectionPage />} />
+            <Route path="/vysvetleno" element={<SectionPage />} />
+            <Route path="/navody" element={<SectionPage />} />
+            <Route path="/nastroje" element={<SectionPage />} />
+            <Route path="/ai-v-praci" element={<SectionPage />} />
+            <Route path="/pro" element={<SectionPage />} />
+            <Route path="/clanek/:slug" element={<ArticlePage />} />
+            <Route path="/prihlaseni" element={<LoginPage />} />
+            <Route path="/ucet" element={<AccountPage />} />
+            <Route path="/newsletter" element={<NewsletterPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
