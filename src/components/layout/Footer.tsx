@@ -61,6 +61,11 @@ const Footer = () => {
             <h3 className="font-semibold mb-4">Informace</h3>
             <ul className="space-y-2 text-sm">
               <li>
+                <Link to="/predplatne" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors font-medium">
+                  Předplatné
+                </Link>
+              </li>
+              <li>
                 <Link to="/newsletter" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">
                   Newsletter
                 </Link>

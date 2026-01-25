@@ -82,26 +82,37 @@ const ArticlePage = () => {
   // Access logic
   const isProSection = section === 'PRO';
   const isLoggedIn = !!user;
+  const isPremiumActive = user?.isPremiumActive || false;
   
-  // Determine what content to show
+  // Determine what content to show based on access rules
   let visibleContent = content;
   let showLock = false;
   let lockType: 'pro' | 'premium' = 'pro';
   let showInlineVisuals = true;
 
-  if (isPremium && !isLoggedIn) {
-    // Premium: show only first paragraph
-    visibleContent = [content[0]];
-    showLock = true;
-    lockType = 'premium';
-    showInlineVisuals = false;
-  } else if (isProSection && !isPremium && !isLoggedIn) {
-    // PRO non-premium: show only excerpt
-    visibleContent = [];
-    showLock = true;
-    lockType = 'pro';
-    showInlineVisuals = false;
+  // C) Premium article (isPremium=true), regardless of section
+  if (isPremium) {
+    if (!isLoggedIn || !isPremiumActive) {
+      // Guest or logged-in but NOT Premium: show ONLY FIRST PARAGRAPH
+      visibleContent = [content[0]];
+      showLock = true;
+      lockType = 'premium';
+      showInlineVisuals = false;
+    }
+    // Logged-in Premium active: show full content (default)
   }
+  // B) PRO non-premium (section="PRO" AND isPremium=false)
+  else if (isProSection && !isPremium) {
+    if (!isLoggedIn) {
+      // Guest: show ONLY excerpt + PRO Lock block
+      visibleContent = [];
+      showLock = true;
+      lockType = 'pro';
+      showInlineVisuals = false;
+    }
+    // Logged-in (free OR premium): show full content (default)
+  }
+  // A) Public article (section != "PRO" AND isPremium=false): Everyone sees full content (default)
 
   const renderContent = (text: string, index: number) => {
     if (text.startsWith('## ')) {

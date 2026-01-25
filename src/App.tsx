@@ -11,6 +11,9 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AccountPage from "./pages/AccountPage";
 import NewsletterPage from "./pages/NewsletterPage";
+import PremiumPage from "./pages/PremiumPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import ThankYouPage from "./pages/ThankYouPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,11 +28,14 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/registrace" element={<RegisterPage />} />
-            <Route path="/:section" element={<SectionPage />} />
-            <Route path="/clanek/:slug" element={<ArticlePage />} />
+            <Route path="/predplatne" element={<PremiumPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/premium-dekuji" element={<ThankYouPage />} />
             <Route path="/prihlaseni" element={<LoginPage />} />
             <Route path="/ucet" element={<AccountPage />} />
             <Route path="/newsletter" element={<NewsletterPage />} />
+            <Route path="/clanek/:slug" element={<ArticlePage />} />
+            <Route path="/:section" element={<SectionPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
