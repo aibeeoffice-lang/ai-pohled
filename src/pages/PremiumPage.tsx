@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Crown, Sparkles, BookOpen, BarChart3, Shield, ChevronDown } from 'lucide-react';
+import { Check, Crown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Accordion,
@@ -20,30 +20,23 @@ const PremiumPage = () => {
   };
 
   const benefits = [
-    'Plný přístup k Premium článkům (včetně grafů, schémat a checklistů)',
-    'PRO pilíře: Byznys & trh · Výzkum · Dev & data · Regulace & governance',
-    'Praktické frameworky, metriky a "jak na to" postupy',
-    'Premium digest do e-mailu (volitelně)',
-  ];
-
-  const pillars = [
-    { icon: BarChart3, name: 'Byznys & trh', desc: 'Investice, pricing, akvizice, dopady na firmy v ČR/EU.' },
-    { icon: BookOpen, name: 'Výzkum', desc: 'Co vyšlo, proč to matters, benchmarky bez zbytečné matematiky.' },
-    { icon: Sparkles, name: 'Dev & data', desc: 'RAG, fine-tuning, evaluace, agenti, MLOps – prakticky.' },
-    { icon: Shield, name: 'Regulace & governance', desc: 'Compliance, interní směrnice, risk management pro firmy.' },
+    'Plný přístup k Premium článkům',
+    'Grafy, schémata a praktické checklisty',
+    'Konkrétní postupy a frameworky z praxe',
+    'Aktivace hned po zaplacení',
   ];
 
   const faqItems = [
     {
       question: 'Co je rozdíl mezi PRO a Premium?',
-      answer: 'PRO je obsah pro přihlášené (bez placení). Premium je placené předplatné pro hloubkové články, které obsahují víc analýzy, schémat a praktických materiálů.',
+      answer: 'PRO je obsah pro přihlášené (bez placení). Premium je placené předplatné pro hloubkové články s grafikou, schématy a praktickými materiály.',
     },
     {
       question: 'Co přesně odemknu s Premium?',
-      answer: 'Plný přístup k Premium článkům (včetně kompletního textu, grafů, schémat, checklistů a frameworků).',
+      answer: 'Plný přístup k Premium článkům (včetně kompletního textu, grafů, schémat a checklistů).',
     },
     {
-      question: 'Můžu předplatné kdykoliv zrušit?',
+      question: 'Můžu Premium kdykoliv zrušit?',
       answer: 'Ano. V ostrém provozu můžeš zrušit kdykoliv v účtu. Přístup běží do konce zaplaceného období.',
     },
     {
@@ -52,15 +45,15 @@ const PremiumPage = () => {
     },
     {
       question: 'Je Premium pro jednotlivce nebo firmy?',
-      answer: 'Primárně pro jednotlivce. Pro firmy lze řešit více licencí (pokud to budeš chtít, doplníme firemní plán).',
+      answer: 'Primárně pro jednotlivce. Pro firmy lze řešit více licencí.',
     },
     {
       question: 'Co když nejsem technický typ?',
-      answer: 'Premium není jen pro developery. Má 4 pilíře, včetně byznysu a governance. Technické věci jsou psané prakticky, bez zbytečné matematiky.',
+      answer: 'Premium je psané prakticky a srozumitelně. Vizuály (grafy, schémata) pomáhají rychle pochopit podstatu.',
     },
     {
       question: 'Proč je část obsahu placená?',
-      answer: 'Premium články jsou náročnější na přípravu (analýza, data, grafy). Předplatné pomáhá udržet kvalitu a pravidelnost.',
+      answer: 'Premium články jsou náročnější na přípravu (analýza, grafy, schémata). Předplatné pomáhá udržet kvalitu a pravidelnost.',
     },
   ];
 
@@ -79,7 +72,7 @@ const PremiumPage = () => {
               Premium
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Hloubkové články a praktické materiály pro profesionální použití AI.
+              Odemkni hloubkové články, grafy, schémata a checklisty.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" onClick={scrollToPricing} className="bg-premium hover:bg-premium/90">
@@ -132,28 +125,6 @@ const PremiumPage = () => {
         </div>
       </section>
 
-      {/* Pillars */}
-      <section className="py-16 md:py-20">
-        <div className="container-narrow">
-          <h2 className="font-display text-2xl md:text-3xl font-bold mb-8 text-center">
-            4 PRO pilíře
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {pillars.map((pillar) => (
-              <div key={pillar.name} className="p-6 rounded-xl bg-card border border-border hover:border-premium/30 transition-colors">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-premium/10 flex items-center justify-center">
-                    <pillar.icon className="h-5 w-5 text-premium" />
-                  </div>
-                  <h3 className="font-display font-semibold text-lg">{pillar.name}</h3>
-                </div>
-                <p className="text-muted-foreground">{pillar.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <AIPulse variant="section" />
 
       {/* Pricing Section */}
@@ -168,7 +139,7 @@ const PremiumPage = () => {
             <div className="p-6 md:p-8 rounded-xl bg-card border border-border">
               <h3 className="font-display text-xl font-bold mb-2">Měsíčně</h3>
               <div className="mb-4">
-                <span className="text-3xl font-bold">199 Kč</span>
+                <span className="text-3xl font-bold">49 Kč</span>
                 <span className="text-muted-foreground"> / měsíc</span>
               </div>
               <p className="text-muted-foreground mb-6">
@@ -177,15 +148,15 @@ const PremiumPage = () => {
               <ul className="space-y-3 mb-6">
                 <li className="flex items-center gap-2 text-sm">
                   <Check className="h-4 w-4 text-premium" />
-                  Premium články napříč PRO pilíři
+                  Premium články
                 </li>
                 <li className="flex items-center gap-2 text-sm">
                   <Check className="h-4 w-4 text-premium" />
-                  Přístup k vizuálům (grafy, schémata)
+                  Grafy a schémata
                 </li>
                 <li className="flex items-center gap-2 text-sm">
                   <Check className="h-4 w-4 text-premium" />
-                  Prémiové checklisty v článcích
+                  Checklisty v článcích
                 </li>
               </ul>
               <Button asChild className="w-full" variant="outline">
@@ -200,7 +171,7 @@ const PremiumPage = () => {
               </Badge>
               <h3 className="font-display text-xl font-bold mb-2">Ročně</h3>
               <div className="mb-4">
-                <span className="text-3xl font-bold">1 990 Kč</span>
+                <span className="text-3xl font-bold">399 Kč</span>
                 <span className="text-muted-foreground"> / rok</span>
               </div>
               <p className="text-sm text-premium mb-2">Ušetříš oproti měsíčnímu.</p>
@@ -214,7 +185,7 @@ const PremiumPage = () => {
                 </li>
                 <li className="flex items-center gap-2 text-sm">
                   <Check className="h-4 w-4 text-premium" />
-                  Priorita na témata (ankety / návrhy)
+                  Výhodnější cena
                 </li>
               </ul>
               <Button asChild className="w-full bg-premium hover:bg-premium/90">
