@@ -17,7 +17,7 @@ const navigation = [
   { name: 'Nástroje', href: '/nastroje' },
   { name: 'AI v práci', href: '/ai-v-praci' },
   { name: 'PRO', href: '/pro' },
-  { name: 'Předplatné', href: '/predplatne', isPremium: true },
+  { name: 'Premium', href: '/predplatne', isPremium: true },
 ];
 
 const Header = () => {

@@ -16,7 +16,7 @@ const CheckoutPage = () => {
 
   const plan = searchParams.get('plan') as 'monthly' | 'annual' | null;
   const planName = plan === 'annual' ? 'Ročně' : 'Měsíčně';
-  const planPrice = plan === 'annual' ? '1 990 Kč / rok' : '199 Kč / měsíc';
+  const planPrice = plan === 'annual' ? '399 Kč / rok' : '49 Kč / měsíc';
 
   useEffect(() => {
     // Redirect guests to login

@@ -62,7 +62,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/predplatne" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors font-medium">
-                  Předplatné
+                  Premium
                 </Link>
               </li>
               <li>
