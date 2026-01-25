@@ -81,9 +81,14 @@ const Header = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button asChild variant="default" size="sm">
-                <Link to="/prihlaseni">Přihlásit se</Link>
-              </Button>
+              <>
+                <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
+                  <Link to="/registrace">Vytvořit účet</Link>
+                </Button>
+                <Button asChild variant="default" size="sm">
+                  <Link to="/prihlaseni">Přihlásit se</Link>
+                </Button>
+              </>
             )}
 
             {/* Mobile menu button */}
@@ -116,6 +121,24 @@ const Header = () => {
                   {item.name}
                 </Link>
               ))}
+              {!user && (
+                <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
+                  <Link
+                    to="/registrace"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-3 py-2 text-sm font-medium rounded-lg text-center bg-secondary text-foreground hover:bg-secondary/80 transition-colors"
+                  >
+                    Vytvořit účet
+                  </Link>
+                  <Link
+                    to="/prihlaseni"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-3 py-2 text-sm font-medium rounded-lg text-center bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                  >
+                    Přihlásit se
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         )}

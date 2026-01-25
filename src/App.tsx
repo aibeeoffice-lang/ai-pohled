@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import SectionPage from "./pages/SectionPage";
 import ArticlePage from "./pages/ArticlePage";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import AccountPage from "./pages/AccountPage";
 import NewsletterPage from "./pages/NewsletterPage";
 import NotFound from "./pages/NotFound";
@@ -23,6 +24,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/registrace" element={<RegisterPage />} />
             <Route path="/:section" element={<SectionPage />} />
             <Route path="/clanek/:slug" element={<ArticlePage />} />
             <Route path="/prihlaseni" element={<LoginPage />} />
