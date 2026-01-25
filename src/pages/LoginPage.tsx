@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,7 +49,7 @@ const LoginPage = () => {
             
             {error && (
               <div className="flex items-center gap-2 text-destructive text-sm">
-                <AlertCircle className="h-4 w-4" />
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
                 <span>{error}</span>
               </div>
             )}
@@ -58,6 +58,13 @@ const LoginPage = () => {
               {loading ? 'Přihlašuji...' : 'Přihlásit se'}
             </Button>
           </form>
+          
+          <p className="text-center text-sm text-muted-foreground mt-6">
+            Nemáš účet?{' '}
+            <Link to="/registrace" className="text-primary hover:underline font-medium">
+              Vytvořit účet
+            </Link>
+          </p>
         </div>
       </div>
     </Layout>

@@ -19,9 +19,14 @@ const LockBlock = ({ type }: LockBlockProps) => {
         <p className="text-muted-foreground mb-6 max-w-md mx-auto">
           Tento článek je v sekci PRO. Přihlas se a dočti ho celý.
         </p>
-        <Button asChild size="lg">
-          <Link to="/prihlaseni">Přihlásit se</Link>
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button asChild size="lg">
+            <Link to="/prihlaseni">Přihlásit se</Link>
+          </Button>
+          <Button asChild variant="outline" size="lg">
+            <Link to="/registrace">Vytvořit účet</Link>
+          </Button>
+        </div>
         <p className="text-xs text-muted-foreground mt-4">
           Zabere to méně než minutu.
         </p>
@@ -43,6 +48,9 @@ const LockBlock = ({ type }: LockBlockProps) => {
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Button asChild size="lg">
           <Link to="/prihlaseni">Přihlásit se a pokračovat</Link>
+        </Button>
+        <Button asChild variant="outline" size="lg">
+          <Link to="/registrace">Vytvořit účet</Link>
         </Button>
       </div>
       <p className="text-xs text-muted-foreground mt-4">
