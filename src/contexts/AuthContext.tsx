@@ -2,11 +2,19 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 interface User {
   email: string;
+  isPremiumActive: boolean;
+  premiumPlan: 'monthly' | 'annual' | null;
+  premiumSince: string | null;
+  premiumCancelAtPeriodEnd?: boolean;
 }
 
 interface StoredUser {
   email: string;
   password: string;
+  isPremiumActive?: boolean;
+  premiumPlan?: 'monthly' | 'annual' | null;
+  premiumSince?: string | null;
+  premiumCancelAtPeriodEnd?: boolean;
 }
 
 interface AuthContextType {
@@ -15,6 +23,9 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  activatePremium: (plan: 'monthly' | 'annual') => void;
+  cancelPremium: () => void;
+  updatePremiumPlan: (plan: 'monthly' | 'annual') => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,6 +42,15 @@ const saveStoredUsers = (users: StoredUser[]) => {
   localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
 };
 
+const updateStoredUser = (email: string, updates: Partial<StoredUser>) => {
+  const users = getStoredUsers();
+  const userIndex = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+  if (userIndex !== -1) {
+    users[userIndex] = { ...users[userIndex], ...updates };
+    saveStoredUsers(users);
+  }
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,7 +59,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Check for existing session
     const savedUser = localStorage.getItem(SESSION_STORAGE_KEY);
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      const parsed = JSON.parse(savedUser);
+      // Ensure premium fields exist
+      setUser({
+        email: parsed.email,
+        isPremiumActive: parsed.isPremiumActive || false,
+        premiumPlan: parsed.premiumPlan || null,
+        premiumSince: parsed.premiumSince || null,
+        premiumCancelAtPeriodEnd: parsed.premiumCancelAtPeriodEnd || false,
+      });
     }
     setIsLoading(false);
   }, []);
@@ -75,12 +103,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     // Create new user
-    const newStoredUser: StoredUser = { email, password };
+    const newStoredUser: StoredUser = { 
+      email, 
+      password,
+      isPremiumActive: false,
+      premiumPlan: null,
+      premiumSince: null,
+    };
     users.push(newStoredUser);
     saveStoredUsers(users);
 
     // Log user in
-    const newUser = { email };
+    const newUser: User = { 
+      email,
+      isPremiumActive: false,
+      premiumPlan: null,
+      premiumSince: null,
+    };
     setUser(newUser);
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newUser));
     
@@ -111,7 +150,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
 
     if (existingUser) {
-      const newUser = { email: existingUser.email };
+      const newUser: User = { 
+        email: existingUser.email,
+        isPremiumActive: existingUser.isPremiumActive || false,
+        premiumPlan: existingUser.premiumPlan || null,
+        premiumSince: existingUser.premiumSince || null,
+        premiumCancelAtPeriodEnd: existingUser.premiumCancelAtPeriodEnd || false,
+      };
       setUser(newUser);
       localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newUser));
       return { success: true };
@@ -119,7 +164,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // Fallback: if no users registered yet, allow any valid email with password >= 3 chars (demo mode)
     if (users.length === 0 && password.length >= 3) {
-      const newUser = { email };
+      const newUser: User = { 
+        email,
+        isPremiumActive: false,
+        premiumPlan: null,
+        premiumSince: null,
+      };
       setUser(newUser);
       localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newUser));
       return { success: true };
@@ -133,8 +183,68 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem(SESSION_STORAGE_KEY);
   };
 
+  const activatePremium = (plan: 'monthly' | 'annual') => {
+    if (!user) return;
+    
+    const updatedUser: User = {
+      ...user,
+      isPremiumActive: true,
+      premiumPlan: plan,
+      premiumSince: new Date().toISOString(),
+      premiumCancelAtPeriodEnd: false,
+    };
+    
+    setUser(updatedUser);
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updatedUser));
+    updateStoredUser(user.email, {
+      isPremiumActive: true,
+      premiumPlan: plan,
+      premiumSince: updatedUser.premiumSince,
+      premiumCancelAtPeriodEnd: false,
+    });
+  };
+
+  const cancelPremium = () => {
+    if (!user) return;
+    
+    const updatedUser: User = {
+      ...user,
+      premiumCancelAtPeriodEnd: true,
+    };
+    
+    setUser(updatedUser);
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updatedUser));
+    updateStoredUser(user.email, {
+      premiumCancelAtPeriodEnd: true,
+    });
+  };
+
+  const updatePremiumPlan = (plan: 'monthly' | 'annual') => {
+    if (!user) return;
+    
+    const updatedUser: User = {
+      ...user,
+      premiumPlan: plan,
+    };
+    
+    setUser(updatedUser);
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updatedUser));
+    updateStoredUser(user.email, {
+      premiumPlan: plan,
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoading, 
+      login, 
+      register, 
+      logout, 
+      activatePremium, 
+      cancelPremium,
+      updatePremiumPlan 
+    }}>
       {children}
     </AuthContext.Provider>
   );

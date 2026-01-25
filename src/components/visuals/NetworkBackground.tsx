@@ -1,11 +1,11 @@
 interface NetworkBackgroundProps {
   className?: string;
-  variant?: 'hero' | 'pro' | 'light';
+  variant?: 'hero' | 'pro' | 'light' | 'premium';
 }
 
 export const NetworkBackground = ({ className = '', variant = 'hero' }: NetworkBackgroundProps) => {
   const opacity = variant === 'light' ? 0.05 : 0.1;
-  const strokeColor = variant === 'light' ? 'hsl(var(--foreground))' : 'white';
+  const strokeColor = variant === 'light' ? 'hsl(var(--foreground))' : variant === 'premium' ? 'hsl(var(--premium))' : 'white';
 
   return (
     <svg 

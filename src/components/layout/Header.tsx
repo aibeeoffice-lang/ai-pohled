@@ -17,6 +17,7 @@ const navigation = [
   { name: 'Nástroje', href: '/nastroje' },
   { name: 'AI v práci', href: '/ai-v-praci' },
   { name: 'PRO', href: '/pro' },
+  { name: 'Předplatné', href: '/predplatne', isPremium: true },
 ];
 
 const Header = () => {
@@ -50,7 +51,7 @@ const Header = () => {
                   isActive(item.href)
                     ? 'bg-secondary text-foreground'
                     : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                } ${item.name === 'PRO' ? 'text-premium font-semibold' : ''}`}
+                } ${item.name === 'PRO' || item.isPremium ? 'text-premium font-semibold' : ''}`}
               >
                 {item.name}
               </Link>
@@ -116,7 +117,7 @@ const Header = () => {
                     isActive(item.href)
                       ? 'bg-secondary text-foreground'
                       : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                  } ${item.name === 'PRO' ? 'text-premium font-semibold' : ''}`}
+                  } ${item.name === 'PRO' || item.isPremium ? 'text-premium font-semibold' : ''}`}
                 >
                   {item.name}
                 </Link>
