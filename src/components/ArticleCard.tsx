@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Lock, Crown } from 'lucide-react';
 import { Article, getSectionColor, getLevelColor, getLevelTooltip } from '@/data/articles';
+import { getPillarBadgeColor } from '@/data/pillars';
+import { parsePlaceholder } from '@/data/coverImages';
 import { Badge } from '@/components/ui/badge';
+import { SectionPlaceholder } from '@/components/visuals';
 import {
   Tooltip,
   TooltipContent,
@@ -14,22 +17,41 @@ interface ArticleCardProps {
 }
 
 const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
-  const { title, slug, section, level, isPremium, excerpt, author, publishedAt } = article;
+  const { title, slug, section, level, isPremium, excerpt, author, publishedAt, coverImage, proPillar } = article;
+
+  // Parse placeholder or use actual image
+  const placeholderData = coverImage ? parsePlaceholder(coverImage) : null;
+  const isPlaceholder = !!placeholderData;
 
   return (
     <Link to={`/clanek/${slug}`} className="block group">
       <article className={`card-magazine h-full flex flex-col ${featured ? 'md:flex-row' : ''}`}>
-        {article.coverImage && (
-          <div className={`relative overflow-hidden ${featured ? 'md:w-1/2' : 'aspect-video'}`}>
+        {/* Thumbnail */}
+        <div className={`relative overflow-hidden ${featured ? 'md:w-2/5' : 'aspect-[16/10]'}`}>
+          {isPlaceholder ? (
+            <SectionPlaceholder 
+              section={placeholderData.section} 
+              pillar={placeholderData.pillar} 
+              className="w-full h-full"
+            />
+          ) : coverImage ? (
             <img
-              src={article.coverImage}
+              src={coverImage}
               alt={title}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
-          </div>
-        )}
+          ) : (
+            <SectionPlaceholder 
+              section={section} 
+              pillar={proPillar} 
+              className="w-full h-full"
+            />
+          )}
+          {/* Overlay gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        </div>
         
-        <div className={`p-5 flex flex-col flex-1 ${featured && article.coverImage ? 'md:w-1/2' : ''}`}>
+        <div className={`p-5 flex flex-col flex-1 ${featured ? 'md:w-3/5' : ''}`}>
           {/* Badges */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <Badge 
@@ -54,6 +76,15 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
               <Badge className="text-xs font-medium bg-premium text-premium-foreground">
                 <Crown className="h-3 w-3 mr-1" />
                 Premium
+              </Badge>
+            )}
+
+            {section === 'PRO' && proPillar && (
+              <Badge 
+                variant="outline" 
+                className={`text-xs font-medium ${getPillarBadgeColor(proPillar)}`}
+              >
+                {proPillar}
               </Badge>
             )}
 

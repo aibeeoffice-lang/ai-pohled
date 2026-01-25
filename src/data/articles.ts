@@ -3,6 +3,15 @@ import { ProPillar } from './pillars';
 export type Section = 'Novinky' | 'Vysvětleno' | 'Návody' | 'Nástroje' | 'AI v práci' | 'PRO';
 export type Level = 'Začátečník' | 'Pokročilý' | 'PRO';
 
+export interface InlineVisual {
+  type: 'image' | 'chart' | 'diagram';
+  src?: string;
+  alt: string;
+  caption?: string;
+  data?: { label: string; value: number }[]; // for charts
+  title?: string;
+}
+
 export interface Article {
   id: string;
   title: string;
@@ -17,6 +26,7 @@ export interface Article {
   publishedAt: string;
   coverImage?: string;
   proPillar?: ProPillar;
+  inlineVisuals?: InlineVisual[];
   whatItMeans?: {
     changed: string;
     important: string;
@@ -34,6 +44,7 @@ export const articles: Article[] = [
     section: 'Novinky',
     level: 'Začátečník',
     isPremium: false,
+    coverImage: 'placeholder:Novinky',
     excerpt: 'AI už není jen okno chatu. Postupně se přesouvá přímo do nástrojů, které používáme každý den – dokumenty, e-mail, tabulky, CRM. A to mění, jak s ní lidé reálně pracují.',
     content: [
       'Ještě před rokem jsme si s AI povídali v okně chatu. Dnes se inteligentní funkce stěhují přímo tam, kde pracujeme – do e-mailových klientů, dokumentových editorů, tabulkových procesorů i CRM systémů. Změna je nenápadná, ale zásadní.',
@@ -45,6 +56,14 @@ export const articles: Article[] = [
     tags: ['AI asistenti', 'produktivita', 'Microsoft', 'Google'],
     author: 'Martin Novák',
     publishedAt: '2026-01-08',
+    inlineVisuals: [
+      { type: 'chart', title: 'Úspora času při integraci AI', alt: 'Graf úspory času', data: [
+        { label: 'E-mail', value: 35 },
+        { label: 'Dokumenty', value: 45 },
+        { label: 'Tabulky', value: 30 },
+        { label: 'CRM', value: 25 }
+      ], caption: 'Průměrná úspora času v % po nasazení AI asistentů' }
+    ],
     whatItMeans: {
       changed: 'AI se přesouvá z chatu přímo do nástrojů a procesů.',
       important: 'Reálné používání roste, když AI šetří kliky a čas, ne když vyžaduje prompty.',
@@ -651,6 +670,15 @@ export const articles: Article[] = [
     level: 'PRO',
     isPremium: true,
     proPillar: 'Byznys & trh',
+    coverImage: 'placeholder:PRO:Byznys & trh',
+    inlineVisuals: [
+      { type: 'chart', title: 'Očekávaný dopad AI na sektory', alt: 'Graf dopadu AI', data: [
+        { label: 'Finance', value: 85 },
+        { label: 'Retail', value: 70 },
+        { label: 'Výroba', value: 60 },
+        { label: 'Služby', value: 75 }
+      ], caption: 'Procentuální připravenost sektorů na AI transformaci' }
+    ],
     excerpt: 'AI už není hračka pro geeky. V roce 2026 rozhodne o penězích a konkurenceschopnosti to, kdo ji zvládne nasadit do procesů – a kdo zůstane u hezkých demíček.',
     content: [
       'Je snadné zamilovat se do nových modelů a jejich wow efektu. Těžší je udělat z AI skutečný výkon: rychlejší práci, levnější procesy, lepší rozhodování. V roce 2026 se bude lámat chleba – firmy, které AI "přilepí" jen na marketing, budou vypadat moderně. Ty, které ji integrují do obchodu, provozu a řízení, budou moderní doopravdy.',
@@ -678,6 +706,7 @@ export const articles: Article[] = [
     level: 'PRO',
     isPremium: false,
     proPillar: 'Byznys & trh',
+    coverImage: 'placeholder:PRO:Byznys & trh',
     excerpt: 'AI projekt je úspěšný teprve tehdy, když se dá obhájit čísly. Ne počtem promptů, ale dopadem na čas, náklady a kvalitu.',
     content: [
       '## Proč většina AI projektů nedojde dál než „wow demo"\n\nJe snadné udělat impresivní demo. Těžké je dostat AI do produkce a měřit reálný dopad. Většina projektů selže na přechodu z "funguje to" na "vyplatí se to".',
