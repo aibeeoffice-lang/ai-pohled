@@ -9,6 +9,7 @@ import { getSectionBySlug, SECTIONS } from '@/data/sections';
 import { PRO_PILLARS, ProPillar } from '@/data/pillars';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { AdSlot } from '@/components/ads';
 
 const SectionPage = () => {
   const { section: sectionSlug } = useParams<{ section: string }>();
@@ -96,73 +97,107 @@ const SectionPage = () => {
     );
   };
 
+  // Split articles for ad insertion (after 6 cards)
+  const firstBatch = filteredArticles.slice(0, 6);
+  const secondBatch = filteredArticles.slice(6);
+
   return (
     <Layout>
       <div className="container-wide py-8 md:py-12">
-        <h1 className="font-display text-3xl md:text-4xl font-bold mb-2">{sectionConfig.title}</h1>
-        
-        {/* PRO intro text */}
-        {isPro && (
-          <p className="text-muted-foreground mb-6">
-            Hloubkové články pro praxi: trh, výzkum, technické postupy a firemní governance. Některý obsah je jen pro přihlášené.
-          </p>
-        )}
+        <div className="flex gap-8">
+          <div className="flex-1">
+            <h1 className="font-display text-3xl md:text-4xl font-bold mb-2">{sectionConfig.title}</h1>
+            
+            {/* PRO intro text */}
+            {isPro && (
+              <p className="text-muted-foreground mb-6">
+                Hloubkové články pro praxi: trh, výzkum, technické postupy a firemní governance. Některý obsah je jen pro přihlášené.
+              </p>
+            )}
 
-        {/* Pillar navigation for PRO */}
-        {isPro && (
-          <div className="mb-6">
-            <div className="text-sm font-medium text-muted-foreground mb-2">Pilíře:</div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant={selectedPillar === 'all' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedPillar('all')}
-              >
-                Vše ({pillarCounts.all})
-              </Button>
-              {PRO_PILLARS.map((pillar) => (
-                <Tooltip key={pillar.key}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant={selectedPillar === pillar.key ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedPillar(pillar.key)}
-                    >
-                      {pillar.label} ({pillarCounts[pillar.key] || 0})
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="max-w-xs">{pillar.description}</p>
-                  </TooltipContent>
-                </Tooltip>
-              ))}
+            {/* Pillar navigation for PRO */}
+            {isPro && (
+              <div className="mb-6">
+                <div className="text-sm font-medium text-muted-foreground mb-2">Pilíře:</div>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant={selectedPillar === 'all' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedPillar('all')}
+                  >
+                    Vše ({pillarCounts.all})
+                  </Button>
+                  {PRO_PILLARS.map((pillar) => (
+                    <Tooltip key={pillar.key}>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant={selectedPillar === pillar.key ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setSelectedPillar(pillar.key)}
+                        >
+                          {pillar.label} ({pillarCounts[pillar.key] || 0})
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">{pillar.description}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <ArticleFilters
+              levels={['Začátečník', 'Pokročilý', 'PRO']}
+              selectedLevel={selectedLevel}
+              onLevelChange={setSelectedLevel}
+              tags={allTags}
+              selectedTags={selectedTags}
+              onTagToggle={handleTagToggle}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              showPremiumOnly={isPro}
+              isPremiumFilter={premiumOnly}
+              onPremiumFilterChange={setPremiumOnly}
+            />
+            
+            {filteredArticles.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <>
+                {/* First batch of articles */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {firstBatch.map(article => (
+                    <ArticleCard key={article.id} article={article} />
+                  ))}
+                </div>
+                
+                {/* Billboard ad after 6 articles */}
+                {secondBatch.length > 0 && (
+                  <div className="my-8">
+                    <AdSlot type="billboard" />
+                  </div>
+                )}
+                
+                {/* Rest of articles */}
+                {secondBatch.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {secondBatch.map(article => (
+                      <ArticleCard key={article.id} article={article} />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+          
+          {/* Vertical Ad Sidebar - desktop only */}
+          <aside className="hidden xl:block w-[300px] flex-shrink-0">
+            <div className="sticky top-24">
+              <AdSlot type="vertical" />
             </div>
-          </div>
-        )}
-        
-        <ArticleFilters
-          levels={['Začátečník', 'Pokročilý', 'PRO']}
-          selectedLevel={selectedLevel}
-          onLevelChange={setSelectedLevel}
-          tags={allTags}
-          selectedTags={selectedTags}
-          onTagToggle={handleTagToggle}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          showPremiumOnly={isPro}
-          isPremiumFilter={premiumOnly}
-          onPremiumFilterChange={setPremiumOnly}
-        />
-        
-        {filteredArticles.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredArticles.map(article => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
-          </div>
-        )}
+          </aside>
+        </div>
       </div>
     </Layout>
   );
