@@ -6,6 +6,7 @@ import NewsletterSignup from '@/components/NewsletterSignup';
 import { Button } from '@/components/ui/button';
 import { articles } from '@/data/articles';
 import { NetworkBackground, AIPulse } from '@/components/visuals';
+import { AdSlot } from '@/components/ads';
 
 const SectionHeader = ({ title, link, linkText }: { title: string; link: string; linkText: string }) => (
   <div className="flex items-center justify-between mb-6">
@@ -55,13 +56,28 @@ const Index = () => {
         <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
       </section>
 
-      {/* Novinky */}
+      {/* Billboard Ad */}
+      <section className="container-wide py-6">
+        <AdSlot type="billboard" />
+      </section>
+
+      {/* Novinky with sidebar */}
       <section className="container-wide py-12 md:py-16">
-        <SectionHeader title="Novinky" link="/novinky" linkText="Všechny novinky" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {novinky.map(article => (
-            <ArticleCard key={article.id} article={article} />
-          ))}
+        <div className="flex gap-8">
+          <div className="flex-1">
+            <SectionHeader title="Novinky" link="/novinky" linkText="Všechny novinky" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {novinky.map(article => (
+                <ArticleCard key={article.id} article={article} />
+              ))}
+            </div>
+          </div>
+          {/* Vertical Ad - desktop only */}
+          <aside className="hidden xl:block w-[300px] flex-shrink-0">
+            <div className="sticky top-24">
+              <AdSlot type="vertical" />
+            </div>
+          </aside>
         </div>
       </section>
 

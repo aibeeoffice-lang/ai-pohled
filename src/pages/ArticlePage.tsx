@@ -11,6 +11,7 @@ import { parsePlaceholder } from '@/data/coverImages';
 import { useAuth } from '@/contexts/AuthContext';
 import { Crown } from 'lucide-react';
 import { SectionPlaceholder, AIPulse } from '@/components/visuals';
+import { AdSlot } from '@/components/ads';
 
 // Inline visual component for charts and diagrams
 const InlineVisual = ({ visual, index }: { visual: { type: string; alt: string; caption?: string; title?: string; data?: { label: string; value: number }[] }; index: number }) => {
@@ -133,7 +134,9 @@ const ArticlePage = () => {
 
   return (
     <Layout>
-      <article className="container-narrow py-8 md:py-12">
+      <div className="container-wide py-8 md:py-12">
+        <div className="flex gap-8">
+          <article className="flex-1 max-w-3xl mx-auto xl:mx-0">
         {/* Header */}
         <header className="mb-8">
           <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -185,6 +188,13 @@ const ArticlePage = () => {
           )}
         </div>
 
+        {/* Billboard Ad - after header, before content */}
+        {!showLock && (
+          <div className="mb-8">
+            <AdSlot type="billboard" />
+          </div>
+        )}
+
         {/* Content */}
         <div className="prose-magazine">
           {showLock && lockType === 'pro' ? (
@@ -231,7 +241,23 @@ const ArticlePage = () => {
 
         {/* Recommended */}
         <RecommendedArticles articles={articles.filter(a => a.section === section)} currentSlug={slug || ''} />
-      </article>
+          </article>
+          
+          {/* Vertical Ad Sidebar - desktop only */}
+          <aside className="hidden xl:block w-[300px] flex-shrink-0">
+            <div className="sticky top-24">
+              <AdSlot type="vertical" />
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      {/* Billboard below paywall for locked content */}
+      {showLock && (
+        <div className="container-wide pb-8">
+          <AdSlot type="billboard" />
+        </div>
+      )}
     </Layout>
   );
 };
