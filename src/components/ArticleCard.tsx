@@ -52,8 +52,9 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
         </div>
         
         <div className={`p-5 flex flex-col flex-1 ${featured ? 'md:w-3/5' : ''}`}>
-          {/* Badges */}
+          {/* Badges - deduplicated */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
+            {/* Section badge - only show if different from level (avoid duplicate PRO) */}
             <Badge 
               variant="outline" 
               className={`text-xs font-medium text-white border-0 ${getSectionColor(section)}`}
@@ -61,16 +62,19 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
               {section}
             </Badge>
             
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge className={`text-xs font-medium ${getLevelColor(level)}`}>
-                  {level}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{getLevelTooltip(level)}</p>
-              </TooltipContent>
-            </Tooltip>
+            {/* Level badge - skip if level equals section (e.g., both are PRO) */}
+            {level.toUpperCase() !== section.toUpperCase() && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge className={`text-xs font-medium ${getLevelColor(level)}`}>
+                    {level}
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{getLevelTooltip(level)}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
 
             {isPremium && (
               <Badge className="text-xs font-medium bg-premium text-premium-foreground">
@@ -88,7 +92,7 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
               </Badge>
             )}
 
-            {section === 'PRO' && !isPremium && (
+            {(section === 'PRO' || level === 'PRO') && !isPremium && (
               <Lock className="h-4 w-4 text-muted-foreground" />
             )}
           </div>

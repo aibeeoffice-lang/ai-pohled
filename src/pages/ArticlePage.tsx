@@ -80,7 +80,8 @@ const ArticlePage = () => {
   const isPlaceholder = !!placeholderData;
   
   // Access logic
-  const isProSection = section === 'PRO';
+  // PRO-gated if section="PRO" OR level="PRO" (regardless of section)
+  const isProGated = section === 'PRO' || level === 'PRO';
   const isLoggedIn = !!user;
   const isPremiumActive = user?.isPremiumActive || false;
   
@@ -101,18 +102,18 @@ const ArticlePage = () => {
     }
     // Logged-in Premium active: show full content (default)
   }
-  // B) PRO non-premium (section="PRO" AND isPremium=false)
-  else if (isProSection && !isPremium) {
+  // B) PRO-gated non-premium (section="PRO" OR level="PRO", AND isPremium=false)
+  else if (isProGated && !isPremium) {
     if (!isLoggedIn) {
-      // Guest: show ONLY excerpt + PRO Lock block
-      visibleContent = [];
+      // Guest: show ONLY FIRST PARAGRAPH + PRO Lock block
+      visibleContent = [content[0]];
       showLock = true;
       lockType = 'pro';
       showInlineVisuals = false;
     }
     // Logged-in (free OR premium): show full content (default)
   }
-  // A) Public article (section != "PRO" AND isPremium=false): Everyone sees full content (default)
+  // A) Public article (not PRO-gated AND isPremium=false): Everyone sees full content (default)
 
   const renderContent = (text: string, index: number) => {
     if (text.startsWith('## ')) {

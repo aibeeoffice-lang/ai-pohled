@@ -24,10 +24,10 @@ const LockBlock = ({ type }: LockBlockProps) => {
           <Lock className="h-6 w-6 text-primary" />
         </div>
         <h3 className="font-display text-xl font-bold mb-2">
-          Pokračování je jen pro přihlášené
+          Přihlas se pro čtení
         </h3>
         <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-          Tento článek je v sekci PRO. Přihlas se a dočti ho celý.
+          Tento článek je pro přihlášené. Přihlas se a dočti ho celý.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button asChild size="lg">
