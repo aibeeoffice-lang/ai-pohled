@@ -43,20 +43,12 @@ const Index = () => {
             <p className="text-xl md:text-2xl text-primary-foreground/80 mb-8 animate-slide-up">
               Novinky, vysvětlení a návody pro běžný život i práci. Bez kouzel, bez paniky.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg hover:shadow-xl transition-all">
-                <Link to="/newsletter">
-                  <Mail className="mr-2 h-5 w-5" />
-                  Odebírat newsletter
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 backdrop-blur-sm">
-                <Link to="/vysvetleno">
-                  Začít ve Vysvětleno
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </div>
+            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg hover:shadow-xl transition-all">
+              <Link to="/newsletter">
+                <Mail className="mr-2 h-5 w-5" />
+                Odebírat newsletter
+              </Link>
+            </Button>
           </div>
         </div>
         {/* Decorative gradient orb */}
