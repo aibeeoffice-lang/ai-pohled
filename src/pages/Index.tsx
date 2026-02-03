@@ -137,10 +137,10 @@ const Index = () => {
             PRO: Pro ty, co to berou vážně
           </h2>
           <p className="text-primary-foreground/80 text-lg max-w-2xl mx-auto mb-8">
-            Hloubková témata z trhu, výzkumu a praxe. Některý obsah je jen pro přihlášené.
+            Hloubková témata z trhu, výzkumu a praxe. Zdarma pro všechny.
           </p>
           <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg">
-            <Link to="/pro">Přihlásit se do PRO</Link>
+            <Link to="/pro">Prohlédnout PRO články</Link>
           </Button>
         </div>
         <div className="absolute -left-20 -top-20 w-80 h-80 bg-premium/10 rounded-full blur-3xl" />
