@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, X, User, LogOut, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -51,8 +51,9 @@ const Header = () => {
                   isActive(item.href)
                     ? 'bg-secondary text-foreground'
                     : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                } ${item.name === 'PRO' || item.isPremium ? 'text-premium font-semibold' : ''}`}
+                } ${item.isPremium ? 'text-premium font-semibold' : ''}`}
               >
+                {item.isPremium && <Crown className="h-3 w-3 inline mr-1" />}
                 {item.name}
               </Link>
             ))}
@@ -117,8 +118,9 @@ const Header = () => {
                     isActive(item.href)
                       ? 'bg-secondary text-foreground'
                       : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                  } ${item.name === 'PRO' || item.isPremium ? 'text-premium font-semibold' : ''}`}
+                  } ${item.isPremium ? 'text-premium font-semibold' : ''}`}
                 >
+                  {item.isPremium && <Crown className="h-3 w-3 inline mr-1" />}
                   {item.name}
                 </Link>
               ))}

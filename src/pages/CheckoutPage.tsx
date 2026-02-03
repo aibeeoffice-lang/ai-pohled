@@ -4,19 +4,20 @@ import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
-import { Crown, Check, AlertCircle } from 'lucide-react';
+import { Crown, Check, AlertCircle, Sparkles } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const CheckoutPage = () => {
-  const { user, activatePremium } = useAuth();
+  const { user, startTrial } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [agreed, setAgreed] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const plan = searchParams.get('plan') as 'monthly' | 'annual' | null;
-  const planName = plan === 'annual' ? 'Ročně' : 'Měsíčně';
+  const planName = plan === 'annual' ? 'Roční' : 'Měsíční';
   const planPrice = plan === 'annual' ? '399 Kč / rok' : '49 Kč / měsíc';
+  const planPriceAfterTrial = plan === 'annual' ? '399 Kč/rok' : '49 Kč/měsíc';
 
   useEffect(() => {
     // Redirect guests to login
@@ -30,10 +31,11 @@ const CheckoutPage = () => {
     
     setIsProcessing(true);
     
-    // Simulate payment processing
+    // Simulate card validation / payment setup
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    activatePremium(plan);
+    // Start 14-day trial
+    startTrial(plan);
     navigate('/premium-dekuji');
   };
 
@@ -44,7 +46,7 @@ const CheckoutPage = () => {
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Nejdřív se přihlas nebo si vytvoř účet, ať ti Premium můžeme přiřadit.
+              Pro spuštění trialu se nejdřív přihlas nebo si vytvoř účet.
             </AlertDescription>
           </Alert>
           <div className="flex gap-4 mt-6 justify-center">
@@ -65,9 +67,9 @@ const CheckoutPage = () => {
       <Layout>
         <div className="container-narrow py-16 md:py-24 text-center">
           <h1 className="font-display text-2xl font-bold mb-4">Nebyl vybrán plán</h1>
-          <p className="text-muted-foreground mb-6">Prosím vyber si plán na stránce Předplatné.</p>
+          <p className="text-muted-foreground mb-6">Prosím vyber si plán na stránce Premium.</p>
           <Button asChild>
-            <Link to="/predplatne">Zpět na Předplatné</Link>
+            <Link to="/predplatne">Zpět na Premium</Link>
           </Button>
         </div>
       </Layout>
@@ -82,20 +84,20 @@ const CheckoutPage = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-premium/20 mb-4">
               <Crown className="h-8 w-8 text-premium" />
             </div>
-            <h1 className="font-display text-3xl font-bold mb-2">Dokončení platby</h1>
+            <h1 className="font-display text-3xl font-bold mb-2">Spusť 14denní trial</h1>
             <p className="text-muted-foreground">
-              Vybral(a) sis plán: <strong>{planName}</strong>
+              Plán: <strong>{planName}</strong> – {planPriceAfterTrial} po skončení trialu
             </p>
           </div>
 
           {/* Plan Summary */}
           <div className="p-6 rounded-xl bg-secondary border border-border mb-6">
-            <h2 className="font-semibold mb-4">Shrnutí plánu</h2>
-            <div className="flex justify-between items-center mb-4 pb-4 border-b border-border">
-              <span>Premium – {planName}</span>
-              <span className="font-bold">{planPrice}</span>
-            </div>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <h2 className="font-semibold mb-4">Co dostaneš</h2>
+            <ul className="space-y-2 text-sm mb-4">
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-premium" />
+                14 dní Premium zdarma
+              </li>
               <li className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-premium" />
                 Přístup k Premium článkům
@@ -106,9 +108,19 @@ const CheckoutPage = () => {
               </li>
               <li className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-premium" />
-                Přístup napříč PRO pilíři
+                Zrušení kdykoliv před koncem trialu
               </li>
             </ul>
+            <div className="pt-4 border-t border-border">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">Dnes:</span>
+                <span className="font-bold text-premium">0 Kč</span>
+              </div>
+              <div className="flex justify-between items-center text-sm mt-1">
+                <span className="text-muted-foreground">Po 14 dnech:</span>
+                <span className="font-medium">{planPrice}</span>
+              </div>
+            </div>
           </div>
 
           {/* Agreement */}
@@ -119,7 +131,7 @@ const CheckoutPage = () => {
               onCheckedChange={(checked) => setAgreed(checked as boolean)}
             />
             <label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
-              Souhlasím s podmínkami a beru na vědomí opakované platby.
+              Souhlasím s podmínkami. Beru na vědomí, že po 14 dnech se spustí platba {planPrice}, pokud nezruším.
             </label>
           </div>
 
@@ -130,16 +142,23 @@ const CheckoutPage = () => {
             className="w-full bg-premium hover:bg-premium/90"
             size="lg"
           >
-            {isProcessing ? 'Zpracovávám...' : 'Dokončit platbu'}
+            {isProcessing ? (
+              'Zpracovávám...'
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Spustit 14 dní zdarma
+              </>
+            )}
           </Button>
 
           <p className="text-xs text-muted-foreground text-center mt-4 italic">
-            Platba je v prototypu simulovaná. V ostrém provozu bude přes platební bránu.
+            V prototypu je platba simulovaná. V ostrém provozu bude přes platební bránu.
           </p>
 
           <div className="mt-6 text-center">
             <Link to="/predplatne" className="text-sm text-muted-foreground hover:text-foreground">
-              ← Zpět na Předplatné
+              ← Zpět na Premium
             </Link>
           </div>
         </div>
