@@ -1,20 +1,25 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Crown, HelpCircle, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { PAYWALL_GUEST, PAYWALL_LOGGED_IN_NO_PREMIUM } from '@/data/premiumCopy';
 
 interface LockBlockProps {
   type: 'guest' | 'logged-in-no-premium';
 }
 
 const LockBlock = ({ type }: LockBlockProps) => {
-  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSecondaryClick = () => {
+    // Navigate back to listing / close paywall
+    navigate(-1);
+  };
 
   if (type === 'guest') {
     // Guest paywall - not logged in
@@ -24,24 +29,24 @@ const LockBlock = ({ type }: LockBlockProps) => {
           <Crown className="h-6 w-6 text-premium" />
         </div>
         <h3 className="font-display text-xl font-bold mb-2">
-          Tenhle článek je Premium
+          {PAYWALL_GUEST.title}
         </h3>
         <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-          Přihlas se nebo si vytvoř účet a spusť 14denní trial zdarma.
+          {PAYWALL_GUEST.text}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button asChild size="lg" className="bg-premium hover:bg-premium/90">
             <Link to="/prihlaseni">
               <Sparkles className="h-4 w-4 mr-2" />
-              Přihlásit se
+              {PAYWALL_GUEST.primaryCta}
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link to="/registrace">Vytvořit účet</Link>
+            <Link to="/registrace">{PAYWALL_GUEST.secondaryCta}</Link>
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-4">
-          14 dní zdarma. Pak 49 Kč/měsíc. Zrušení kdykoliv.
+          {PAYWALL_GUEST.subtext}
         </p>
         
         {/* Why Premium tooltip */}
@@ -72,21 +77,27 @@ const LockBlock = ({ type }: LockBlockProps) => {
         <Crown className="h-6 w-6 text-premium" />
       </div>
       <h3 className="font-display text-xl font-bold mb-2">
-        Odemkni Premium
+        {PAYWALL_LOGGED_IN_NO_PREMIUM.title}
       </h3>
       <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-        Máš účet, teď jen spusť trial. 14 dní zdarma, bez závazků.
+        {PAYWALL_LOGGED_IN_NO_PREMIUM.text}
       </p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Button asChild size="lg" className="bg-premium hover:bg-premium/90">
           <Link to="/predplatne">
             <Crown className="h-4 w-4 mr-2" />
-            Spustit 14denní trial
+            {PAYWALL_LOGGED_IN_NO_PREMIUM.primaryCta}
           </Link>
         </Button>
       </div>
-      <p className="text-xs text-muted-foreground mt-4">
-        Pak 49 Kč/měsíc. Zrušení kdykoliv.
+      <button 
+        onClick={handleSecondaryClick}
+        className="text-sm text-muted-foreground hover:text-foreground mt-4 underline cursor-pointer"
+      >
+        {PAYWALL_LOGGED_IN_NO_PREMIUM.secondaryLink}
+      </button>
+      <p className="text-xs text-muted-foreground mt-2">
+        {PAYWALL_LOGGED_IN_NO_PREMIUM.subtext}
       </p>
       
       {/* Why Premium tooltip */}
