@@ -78,8 +78,11 @@ const RegisterPage = () => {
       <div className="container-narrow py-16 md:py-24">
         <div className="max-w-md mx-auto">
           <h1 className="font-display text-3xl font-bold mb-2">Vytvořit účet</h1>
-          <p className="text-muted-foreground mb-8">
-            Získej přístup k PRO obsahu a Premium článkům po přihlášení.
+          <p className="text-muted-foreground mb-6">
+            Vytvoř si účet a odemkni Premium (14 dní zdarma po zadání karty).
+          </p>
+          <p className="text-sm text-muted-foreground/80 mb-8">
+            PRO je zdarma pro všechny. Premium je pro hloubkové články a materiály.
           </p>
           
           <form onSubmit={handleSubmit} className="space-y-4">

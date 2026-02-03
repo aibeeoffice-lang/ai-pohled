@@ -35,7 +35,7 @@ const LoginPage = () => {
       <div className="container-narrow py-16 md:py-24">
         <div className="max-w-md mx-auto">
           <h1 className="font-display text-3xl font-bold mb-2">Přihlášení</h1>
-          <p className="text-muted-foreground mb-8">Odemkni PRO obsah a pokračuj tam, kde jsi skončil.</p>
+          <p className="text-muted-foreground mb-8">Přihlas se a pokračuj tam, kde jsi skončil.</p>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

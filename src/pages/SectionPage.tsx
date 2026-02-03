@@ -111,7 +111,7 @@ const SectionPage = () => {
             {/* PRO intro text */}
             {isPro && (
               <p className="text-muted-foreground mb-6">
-                Hloubkové články pro praxi: trh, výzkum, technické postupy a firemní governance. Některý obsah je jen pro přihlášené.
+                Hloubkové články pro praxi: trh, výzkum, technické postupy a firemní governance. Zdarma pro všechny.
               </p>
             )}
 

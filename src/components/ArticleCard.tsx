@@ -92,9 +92,6 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
               </Badge>
             )}
 
-            {(section === 'PRO' || level === 'PRO') && !isPremium && (
-              <Lock className="h-4 w-4 text-muted-foreground" />
-            )}
           </div>
 
           {/* Title */}
