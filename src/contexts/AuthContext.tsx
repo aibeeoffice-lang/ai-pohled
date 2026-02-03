@@ -2,18 +2,20 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 interface User {
   email: string;
-  isPremiumActive: boolean;
+  premiumStatus: 'none' | 'trialing' | 'active';
   premiumPlan: 'monthly' | 'annual' | null;
   premiumSince: string | null;
+  trialEndsAt: string | null;
   premiumCancelAtPeriodEnd?: boolean;
 }
 
 interface StoredUser {
   email: string;
   password: string;
-  isPremiumActive?: boolean;
+  premiumStatus?: 'none' | 'trialing' | 'active';
   premiumPlan?: 'monthly' | 'annual' | null;
   premiumSince?: string | null;
+  trialEndsAt?: string | null;
   premiumCancelAtPeriodEnd?: boolean;
 }
 
@@ -23,9 +25,11 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  startTrial: (plan: 'monthly' | 'annual') => void;
   activatePremium: (plan: 'monthly' | 'annual') => void;
   cancelPremium: () => void;
   updatePremiumPlan: (plan: 'monthly' | 'annual') => void;
+  hasPremiumAccess: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,32 +55,66 @@ const updateStoredUser = (email: string, updates: Partial<StoredUser>) => {
   }
 };
 
+// Helper to migrate old user format to new format
+const migrateUser = (parsed: any): User => {
+  // Handle old isPremiumActive field
+  let premiumStatus: 'none' | 'trialing' | 'active' = 'none';
+  if (parsed.premiumStatus) {
+    premiumStatus = parsed.premiumStatus;
+  } else if (parsed.isPremiumActive) {
+    premiumStatus = 'active';
+  }
+  
+  return {
+    email: parsed.email,
+    premiumStatus,
+    premiumPlan: parsed.premiumPlan || null,
+    premiumSince: parsed.premiumSince || null,
+    trialEndsAt: parsed.trialEndsAt || null,
+    premiumCancelAtPeriodEnd: parsed.premiumCancelAtPeriodEnd || false,
+  };
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Check if trial has expired
+  const checkTrialExpiration = (userData: User): User => {
+    if (userData.premiumStatus === 'trialing' && userData.trialEndsAt) {
+      const trialEnd = new Date(userData.trialEndsAt);
+      if (new Date() > trialEnd) {
+        // Trial expired - in prototype, auto-activate for demo purposes
+        return {
+          ...userData,
+          premiumStatus: 'active',
+          premiumSince: userData.trialEndsAt,
+        };
+      }
+    }
+    return userData;
+  };
 
   useEffect(() => {
     // Check for existing session
     const savedUser = localStorage.getItem(SESSION_STORAGE_KEY);
     if (savedUser) {
       const parsed = JSON.parse(savedUser);
-      // Ensure premium fields exist
-      setUser({
-        email: parsed.email,
-        isPremiumActive: parsed.isPremiumActive || false,
-        premiumPlan: parsed.premiumPlan || null,
-        premiumSince: parsed.premiumSince || null,
-        premiumCancelAtPeriodEnd: parsed.premiumCancelAtPeriodEnd || false,
-      });
+      let userData = migrateUser(parsed);
+      userData = checkTrialExpiration(userData);
+      setUser(userData);
+      // Update storage with migrated data
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(userData));
     }
     setIsLoading(false);
   }, []);
 
+  // Derived value: does user have premium access (trialing or active)?
+  const hasPremiumAccess = user?.premiumStatus === 'trialing' || user?.premiumStatus === 'active';
+
   const register = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Validation
     if (!email) {
       return { success: false, error: 'Zadej prosím e-mail.' };
     }
@@ -94,7 +132,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return { success: false, error: 'Heslo musí mít alespoň 3 znaky.' };
     }
 
-    // Check if email already exists
     const users = getStoredUsers();
     const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     
@@ -102,23 +139,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return { success: false, error: 'Tento e-mail už je registrovaný. Přihlas se.' };
     }
 
-    // Create new user
     const newStoredUser: StoredUser = { 
       email, 
       password,
-      isPremiumActive: false,
+      premiumStatus: 'none',
       premiumPlan: null,
       premiumSince: null,
+      trialEndsAt: null,
     };
     users.push(newStoredUser);
     saveStoredUsers(users);
 
-    // Log user in
     const newUser: User = { 
       email,
-      isPremiumActive: false,
+      premiumStatus: 'none',
       premiumPlan: null,
       premiumSince: null,
+      trialEndsAt: null,
     };
     setUser(newUser);
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newUser));
@@ -127,10 +164,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Simple validation
     if (!email) {
       return { success: false, error: 'Zadej prosím e-mail.' };
     }
@@ -143,32 +178,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return { success: false, error: 'E-mail nebo heslo nesedí. Zkus to znovu.' };
     }
 
-    // Check against registered users
     const users = getStoredUsers();
     const existingUser = users.find(
       u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
     );
 
     if (existingUser) {
-      const newUser: User = { 
-        email: existingUser.email,
-        isPremiumActive: existingUser.isPremiumActive || false,
-        premiumPlan: existingUser.premiumPlan || null,
-        premiumSince: existingUser.premiumSince || null,
-        premiumCancelAtPeriodEnd: existingUser.premiumCancelAtPeriodEnd || false,
-      };
-      setUser(newUser);
-      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newUser));
+      let userData = migrateUser(existingUser);
+      userData = checkTrialExpiration(userData);
+      setUser(userData);
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(userData));
       return { success: true };
     }
 
-    // Fallback: if no users registered yet, allow any valid email with password >= 3 chars (demo mode)
+    // Demo mode fallback
     if (users.length === 0 && password.length >= 3) {
       const newUser: User = { 
         email,
-        isPremiumActive: false,
+        premiumStatus: 'none',
         premiumPlan: null,
         premiumSince: null,
+        trialEndsAt: null,
       };
       setUser(newUser);
       localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(newUser));
@@ -183,23 +213,49 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem(SESSION_STORAGE_KEY);
   };
 
-  const activatePremium = (plan: 'monthly' | 'annual') => {
+  const startTrial = (plan: 'monthly' | 'annual') => {
     if (!user) return;
+    
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + 14);
     
     const updatedUser: User = {
       ...user,
-      isPremiumActive: true,
+      premiumStatus: 'trialing',
       premiumPlan: plan,
-      premiumSince: new Date().toISOString(),
+      trialEndsAt: trialEnd.toISOString(),
       premiumCancelAtPeriodEnd: false,
     };
     
     setUser(updatedUser);
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updatedUser));
     updateStoredUser(user.email, {
-      isPremiumActive: true,
+      premiumStatus: 'trialing',
+      premiumPlan: plan,
+      trialEndsAt: updatedUser.trialEndsAt,
+      premiumCancelAtPeriodEnd: false,
+    });
+  };
+
+  const activatePremium = (plan: 'monthly' | 'annual') => {
+    if (!user) return;
+    
+    const updatedUser: User = {
+      ...user,
+      premiumStatus: 'active',
+      premiumPlan: plan,
+      premiumSince: new Date().toISOString(),
+      trialEndsAt: null,
+      premiumCancelAtPeriodEnd: false,
+    };
+    
+    setUser(updatedUser);
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updatedUser));
+    updateStoredUser(user.email, {
+      premiumStatus: 'active',
       premiumPlan: plan,
       premiumSince: updatedUser.premiumSince,
+      trialEndsAt: null,
       premiumCancelAtPeriodEnd: false,
     });
   };
@@ -241,9 +297,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       login, 
       register, 
       logout, 
+      startTrial,
       activatePremium, 
       cancelPremium,
-      updatePremiumPlan 
+      updatePremiumPlan,
+      hasPremiumAccess,
     }}>
       {children}
     </AuthContext.Provider>

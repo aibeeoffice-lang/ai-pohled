@@ -67,7 +67,7 @@ const InlineVisual = ({ visual, index }: { visual: { type: string; alt: string; 
 
 const ArticlePage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { user } = useAuth();
+  const { user, hasPremiumAccess } = useAuth();
   const article = articles.find(a => a.slug === slug);
 
   if (!article) {
@@ -80,41 +80,34 @@ const ArticlePage = () => {
   const placeholderData = coverImage ? parsePlaceholder(coverImage) : null;
   const isPlaceholder = !!placeholderData;
   
-  // Access logic
-  // PRO-gated if section="PRO" OR level="PRO" (regardless of section)
-  const isProGated = section === 'PRO' || level === 'PRO';
+  // Access logic - PRO is now PUBLIC (no gating)
+  // Only Premium articles are gated
   const isLoggedIn = !!user;
-  const isPremiumActive = user?.isPremiumActive || false;
   
   // Determine what content to show based on access rules
   let visibleContent = content;
   let showLock = false;
-  let lockType: 'pro' | 'premium' = 'pro';
+  let lockType: 'guest' | 'logged-in-no-premium' = 'guest';
   let showInlineVisuals = true;
 
-  // C) Premium article (isPremium=true), regardless of section
+  // Premium article (isPremium=true): Apply premium gating
   if (isPremium) {
-    if (!isLoggedIn || !isPremiumActive) {
-      // Guest or logged-in but NOT Premium: show ONLY FIRST PARAGRAPH
-      visibleContent = [content[0]];
-      showLock = true;
-      lockType = 'premium';
-      showInlineVisuals = false;
-    }
-    // Logged-in Premium active: show full content (default)
-  }
-  // B) PRO-gated non-premium (section="PRO" OR level="PRO", AND isPremium=false)
-  else if (isProGated && !isPremium) {
     if (!isLoggedIn) {
-      // Guest: show ONLY FIRST PARAGRAPH + PRO Lock block
+      // Guest: show ONLY FIRST PARAGRAPH + guest paywall
       visibleContent = [content[0]];
       showLock = true;
-      lockType = 'pro';
+      lockType = 'guest';
+      showInlineVisuals = false;
+    } else if (!hasPremiumAccess) {
+      // Logged-in but no Premium/trial: show ONLY FIRST PARAGRAPH + logged-in paywall
+      visibleContent = [content[0]];
+      showLock = true;
+      lockType = 'logged-in-no-premium';
       showInlineVisuals = false;
     }
-    // Logged-in (free OR premium): show full content (default)
+    // Logged-in with trialing or active: show full content (default)
   }
-  // A) Public article (not PRO-gated AND isPremium=false): Everyone sees full content (default)
+  // Non-premium article (including PRO): Everyone sees full content
 
   const renderContent = (text: string, index: number) => {
     if (text.startsWith('## ')) {
@@ -197,42 +190,37 @@ const ArticlePage = () => {
 
         {/* Content */}
         <div className="prose-magazine">
-          {showLock && lockType === 'pro' ? (
-            <LockBlock type="pro" />
-          ) : (
-            <>
-              {visibleContent.map((p, i) => {
-                const elements = [renderContent(p, i)];
-                
-                // Insert inline visual after certain paragraphs (for logged-in users or public content)
-                if (showInlineVisuals && inlineVisuals && inlineVisuals.length > 0) {
-                  const visualIndex = Math.floor((i + 1) / Math.ceil(visibleContent.length / inlineVisuals.length));
-                  if (i === Math.floor(visibleContent.length / 3) && inlineVisuals[0]) {
-                    elements.push(<InlineVisual key={`visual-${0}`} visual={inlineVisuals[0]} index={0} />);
-                  }
-                  if (i === Math.floor(visibleContent.length * 2 / 3) && inlineVisuals[1]) {
-                    elements.push(<InlineVisual key={`visual-${1}`} visual={inlineVisuals[1]} index={1} />);
-                  }
-                }
-                
-                return elements;
-              })}
-              
-              {whatItMeans && section === 'Novinky' && (
-                <WhatItMeansBox data={whatItMeans} />
-              )}
-              
-              {showLock && lockType === 'premium' && <LockBlock type="premium" />}
-            </>
+          {visibleContent.map((p, i) => {
+            const elements = [renderContent(p, i)];
+            
+            // Insert inline visual after certain paragraphs (for authorized users)
+            if (showInlineVisuals && inlineVisuals && inlineVisuals.length > 0) {
+              if (i === Math.floor(visibleContent.length / 3) && inlineVisuals[0]) {
+                elements.push(<InlineVisual key={`visual-${0}`} visual={inlineVisuals[0]} index={0} />);
+              }
+              if (i === Math.floor(visibleContent.length * 2 / 3) && inlineVisuals[1]) {
+                elements.push(<InlineVisual key={`visual-${1}`} visual={inlineVisuals[1]} index={1} />);
+              }
+            }
+            
+            return elements;
+          })}
+          
+          {whatItMeans && section === 'Novinky' && !showLock && (
+            <WhatItMeansBox data={whatItMeans} />
           )}
+          
+          {showLock && <LockBlock type={lockType} />}
         </div>
 
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 mt-8 pt-8 border-t border-border">
-          {tags.map(tag => (
-            <Badge key={tag} variant="outline">{tag}</Badge>
-          ))}
-        </div>
+        {!showLock && (
+          <div className="flex flex-wrap gap-2 mt-8 pt-8 border-t border-border">
+            {tags.map(tag => (
+              <Badge key={tag} variant="outline">{tag}</Badge>
+            ))}
+          </div>
+        )}
 
         {/* Newsletter */}
         <div className="mt-12 p-6 bg-secondary rounded-xl">
