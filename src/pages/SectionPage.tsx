@@ -20,6 +20,7 @@ const SectionPage = () => {
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
   const [premiumOnly, setPremiumOnly] = useState(false);
   const [selectedPillar, setSelectedPillar] = useState<ProPillar | 'all'>('all');
+  const [videoOnly, setVideoOnly] = useState(false);
 
   // If not a valid section slug, check if it's a special page route
   if (!sectionConfig) {
@@ -82,6 +83,11 @@ const SectionPage = () => {
       result = result.filter(a => a.isPremium);
     }
     
+    // Video filter
+    if (videoOnly) {
+      result = result.filter(a => a.type === 'video');
+    }
+    
     result.sort((a, b) => {
       const dateA = new Date(a.publishedAt).getTime();
       const dateB = new Date(b.publishedAt).getTime();
@@ -89,7 +95,7 @@ const SectionPage = () => {
     });
     
     return result;
-  }, [sectionArticles, selectedLevel, selectedTags, sortBy, premiumOnly, selectedPillar, isPro]);
+  }, [sectionArticles, selectedLevel, selectedTags, sortBy, premiumOnly, selectedPillar, isPro, videoOnly]);
 
   const handleTagToggle = (tag: string) => {
     setSelectedTags(prev => 
@@ -159,6 +165,9 @@ const SectionPage = () => {
               showPremiumOnly={isPro}
               isPremiumFilter={premiumOnly}
               onPremiumFilterChange={setPremiumOnly}
+              showVideoFilter={true}
+              videoOnly={videoOnly}
+              onVideoFilterChange={setVideoOnly}
             />
             
             {filteredArticles.length === 0 ? (

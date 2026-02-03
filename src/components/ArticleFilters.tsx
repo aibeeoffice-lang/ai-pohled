@@ -1,6 +1,7 @@
-import { Level } from '@/data/articles';
+import { Level, ArticleType } from '@/data/articles';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Play } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -21,6 +22,10 @@ interface ArticleFiltersProps {
   showPremiumOnly?: boolean;
   isPremiumFilter?: boolean;
   onPremiumFilterChange?: (value: boolean) => void;
+  // Video filter
+  showVideoFilter?: boolean;
+  videoOnly?: boolean;
+  onVideoFilterChange?: (value: boolean) => void;
 }
 
 const ArticleFilters = ({
@@ -35,6 +40,9 @@ const ArticleFilters = ({
   showPremiumOnly = false,
   isPremiumFilter = false,
   onPremiumFilterChange,
+  showVideoFilter = false,
+  videoOnly = false,
+  onVideoFilterChange,
 }: ArticleFiltersProps) => {
   return (
     <div className="space-y-4 mb-8">
@@ -75,6 +83,19 @@ const ArticleFilters = ({
             </SelectContent>
           </Select>
         </div>
+
+        {/* Video Filter */}
+        {showVideoFilter && onVideoFilterChange && (
+          <Button
+            variant={videoOnly ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onVideoFilterChange(!videoOnly)}
+            className="gap-1"
+          >
+            <Play className="h-3 w-3 fill-current" />
+            Jen video
+          </Button>
+        )}
 
         {/* Premium Toggle */}
         {showPremiumOnly && onPremiumFilterChange && (

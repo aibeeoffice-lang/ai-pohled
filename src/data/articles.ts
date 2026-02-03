@@ -2,6 +2,22 @@ import { ProPillar } from './pillars';
 
 export type Section = 'Novinky' | 'Vysvětleno' | 'Návody' | 'Nástroje' | 'AI v práci' | 'PRO';
 export type Level = 'Začátečník' | 'Pokročilý' | 'PRO';
+export type ArticleType = 'text' | 'video';
+
+export interface VideoChapter {
+  t: number; // seconds
+  title: string;
+}
+
+export interface VideoData {
+  provider: 'youtube' | 'vimeo' | 'embed';
+  url: string;
+  posterUrl?: string;
+  durationSeconds?: number;
+  captionsUrl?: string;
+  transcript?: string;
+  chapters?: VideoChapter[];
+}
 
 export interface InlineVisual {
   type: 'image' | 'chart' | 'diagram';
@@ -33,7 +49,17 @@ export interface Article {
     affects: string;
     recommendation: string;
   };
+  // Video article support
+  type?: ArticleType;
+  video?: VideoData;
 }
+
+// Helper to format video duration
+export const formatDuration = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
 
 export const articles: Article[] = [
   // NOVINKY (6 articles)
@@ -940,7 +966,206 @@ export const articles: Article[] = [
     tags: ['RAG', 'architektura', 'MLOps', 'produkce'],
     author: 'Eva Horová',
     publishedAt: '2025-12-20'
-  }
+  },
+
+  // ============================================
+  // VIDEO ARTICLES
+  // ============================================
+
+  // VIDEO 1 - Vysvětleno (public)
+  {
+    id: 'v1',
+    title: 'Co je to ChatGPT? Video vysvětlení pro začátečníky',
+    slug: 'video-co-je-chatgpt',
+    section: 'Vysvětleno',
+    level: 'Začátečník',
+    isPremium: false,
+    type: 'video',
+    excerpt: 'Základní vysvětlení ChatGPT ve 4 minutách. Jak funguje, k čemu ho použít a na co si dát pozor.',
+    content: [
+      'V tomto videu se dozvíte základy o ChatGPT – co to vlastně je, jak funguje a k čemu ho můžete použít v každodenním životě i práci.',
+    ],
+    tags: ['ChatGPT', 'základy', 'video', 'začátečník'],
+    author: 'Martin Novák',
+    publishedAt: '2026-01-10',
+    coverImage: 'placeholder:Vysvětleno',
+    video: {
+      provider: 'youtube',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      durationSeconds: 248,
+      chapters: [
+        { t: 0, title: 'Úvod' },
+        { t: 30, title: 'Co je ChatGPT' },
+        { t: 90, title: 'Jak funguje' },
+        { t: 180, title: 'Praktické použití' },
+        { t: 220, title: 'Na co si dát pozor' },
+      ],
+      transcript: 'Ahoj, dnes si vysvětlíme, co je to ChatGPT a jak ho můžete začít používat. ChatGPT je velký jazykový model vyvinutý společností OpenAI. Funguje tak, že predikuje, jaké slovo pravděpodobně přijde jako další v textu...',
+    },
+  },
+
+  // VIDEO 2 - Vysvětleno (public)
+  {
+    id: 'v2',
+    title: 'Prompt engineering v praxi: 5 technik, které fungují',
+    slug: 'video-prompt-engineering-techniky',
+    section: 'Vysvětleno',
+    level: 'Pokročilý',
+    isPremium: false,
+    type: 'video',
+    excerpt: 'Praktické video o tom, jak psát lepší prompty. 5 technik s reálnými ukázkami.',
+    content: [
+      'Naučte se 5 osvědčených technik pro psaní promptů, které vám pomohou získat lepší výsledky z AI nástrojů.',
+    ],
+    tags: ['prompty', 'techniky', 'video', 'produktivita'],
+    author: 'Eva Horová',
+    publishedAt: '2026-01-08',
+    coverImage: 'placeholder:Vysvětleno',
+    video: {
+      provider: 'youtube',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      durationSeconds: 612,
+      chapters: [
+        { t: 0, title: 'Úvod' },
+        { t: 45, title: 'Technika 1: Role prompting' },
+        { t: 150, title: 'Technika 2: Few-shot examples' },
+        { t: 280, title: 'Technika 3: Chain of thought' },
+        { t: 400, title: 'Technika 4: Structured output' },
+        { t: 510, title: 'Technika 5: Iterativní refinement' },
+      ],
+    },
+  },
+
+  // VIDEO 3 - Návody (public)
+  {
+    id: 'v3',
+    title: 'Návod: Jak nastavit AI asistenta v Google Workspace',
+    slug: 'video-ai-google-workspace',
+    section: 'Návody',
+    level: 'Začátečník',
+    isPremium: false,
+    type: 'video',
+    excerpt: 'Krok za krokem: aktivace a nastavení Gemini v Google Docs, Sheets a Gmail.',
+    content: [
+      'Kompletní průvodce nastavením AI asistenta Gemini v Google Workspace. Od aktivace po první použití.',
+    ],
+    tags: ['Google', 'Gemini', 'video', 'návod'],
+    author: 'Petra Králová',
+    publishedAt: '2026-01-06',
+    coverImage: 'placeholder:Návody',
+    video: {
+      provider: 'youtube',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      durationSeconds: 485,
+      chapters: [
+        { t: 0, title: 'Úvod' },
+        { t: 30, title: 'Aktivace Gemini' },
+        { t: 120, title: 'Gemini v Google Docs' },
+        { t: 240, title: 'Gemini v Sheets' },
+        { t: 360, title: 'Gemini v Gmail' },
+        { t: 440, title: 'Tipy a triky' },
+      ],
+    },
+  },
+
+  // VIDEO 4 - Nástroje (public)
+  {
+    id: 'v4',
+    title: 'Recenze: Midjourney vs DALL-E 3 vs Stable Diffusion',
+    slug: 'video-srovnani-obrazovych-ai',
+    section: 'Nástroje',
+    level: 'Pokročilý',
+    isPremium: false,
+    type: 'video',
+    excerpt: 'Video srovnání tří nejpopulárnějších AI generátorů obrázků. Kvalita, cena, použitelnost.',
+    content: [
+      'Podrobné srovnání Midjourney, DALL-E 3 a Stable Diffusion. Který je nejlepší pro vaše potřeby?',
+    ],
+    tags: ['Midjourney', 'DALL-E', 'Stable Diffusion', 'video', 'recenze'],
+    author: 'Jan Svoboda',
+    publishedAt: '2026-01-04',
+    coverImage: 'placeholder:Nástroje',
+    video: {
+      provider: 'youtube',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      durationSeconds: 892,
+      chapters: [
+        { t: 0, title: 'Úvod' },
+        { t: 60, title: 'Midjourney' },
+        { t: 300, title: 'DALL-E 3' },
+        { t: 540, title: 'Stable Diffusion' },
+        { t: 750, title: 'Srovnání a verdikt' },
+      ],
+    },
+  },
+
+  // VIDEO 5 - PRO (Premium video)
+  {
+    id: 'v5',
+    title: 'Masterclass: Firemní AI strategie od nuly',
+    slug: 'video-premium-ai-strategie-masterclass',
+    section: 'PRO',
+    level: 'PRO',
+    isPremium: true,
+    proPillar: 'Byznys & trh',
+    type: 'video',
+    excerpt: 'Exkluzivní video workshop o tvorbě AI strategie pro firmy. Od analýzy po implementaci.',
+    content: [
+      'Kompletní masterclass o tvorbě firemní AI strategie. Získejte rámec, který můžete aplikovat ve své organizaci.',
+    ],
+    tags: ['strategie', 'enterprise', 'video', 'masterclass', 'premium'],
+    author: 'Martin Novák',
+    publishedAt: '2026-01-12',
+    coverImage: 'placeholder:PRO:Byznys & trh',
+    video: {
+      provider: 'youtube',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      durationSeconds: 2340,
+      posterUrl: 'placeholder:PRO:Byznys & trh',
+      chapters: [
+        { t: 0, title: 'Úvod' },
+        { t: 120, title: 'Audit stávajícího stavu' },
+        { t: 480, title: 'Identifikace příležitostí' },
+        { t: 900, title: 'Prioritizace use cases' },
+        { t: 1320, title: 'Roadmap a governance' },
+        { t: 1800, title: 'Měření ROI' },
+        { t: 2100, title: 'Case studies' },
+      ],
+      transcript: 'Vítejte v masterclass o firemní AI strategii. V následujících 40 minutách vám ukážu kompletní rámec, který používám při konzultacích s enterprise klienty...',
+    },
+  },
+
+  // VIDEO 6 - Novinky (Premium video)
+  {
+    id: 'v6',
+    title: 'Deep dive: OpenAI o3 – technická analýza',
+    slug: 'video-premium-openai-o3-analyza',
+    section: 'Novinky',
+    level: 'PRO',
+    isPremium: true,
+    type: 'video',
+    excerpt: 'Hloubková technická analýza nového modelu o3. Co se změnilo pod kapotou a proč na tom záleží.',
+    content: [
+      'Exkluzivní technická analýza modelu o3 od OpenAI. Rozbor architektury, benchmarků a praktických implikací.',
+    ],
+    tags: ['OpenAI', 'o3', 'video', 'analýza', 'premium'],
+    author: 'Eva Horová',
+    publishedAt: '2026-01-11',
+    coverImage: 'placeholder:Novinky',
+    video: {
+      provider: 'youtube',
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      durationSeconds: 1560,
+      chapters: [
+        { t: 0, title: 'Úvod' },
+        { t: 90, title: 'Architektura o3' },
+        { t: 360, title: 'Benchmark analýza' },
+        { t: 720, title: 'Srovnání s o1' },
+        { t: 1080, title: 'Praktické implikace' },
+        { t: 1380, title: 'Co očekávat dál' },
+      ],
+    },
+  },
 ];
 
 export const getSectionSlug = (section: Section): string => {

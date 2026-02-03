@@ -9,9 +9,10 @@ import { articles, getSectionColor, getLevelColor } from '@/data/articles';
 import { getPillarBadgeColor } from '@/data/pillars';
 import { parsePlaceholder } from '@/data/coverImages';
 import { useAuth } from '@/contexts/AuthContext';
-import { Crown } from 'lucide-react';
+import { Crown, Play } from 'lucide-react';
 import { SectionPlaceholder, AIPulse } from '@/components/visuals';
 import { AdSlot } from '@/components/ads';
+import { VideoPlayer, LockedVideoOverlay } from '@/components/VideoPlayer';
 
 // Inline visual component for charts and diagrams
 const InlineVisual = ({ visual, index }: { visual: { type: string; alt: string; caption?: string; title?: string; data?: { label: string; value: number }[] }; index: number }) => {
@@ -74,7 +75,9 @@ const ArticlePage = () => {
     return <Layout><div className="container-narrow py-16">Článek nenalezen</div></Layout>;
   }
 
-  const { title, section, level, isPremium, excerpt, content, tags, author, publishedAt, whatItMeans, coverImage, proPillar, inlineVisuals } = article;
+  const { title, section, level, isPremium, excerpt, content, tags, author, publishedAt, whatItMeans, coverImage, proPillar, inlineVisuals, type, video } = article;
+  
+  const isVideo = type === 'video';
   
   // Parse cover image
   const placeholderData = coverImage ? parsePlaceholder(coverImage) : null;
@@ -89,6 +92,7 @@ const ArticlePage = () => {
   let showLock = false;
   let lockType: 'guest' | 'logged-in-no-premium' = 'guest';
   let showInlineVisuals = true;
+  let canPlayVideo = true;
 
   // Premium article (isPremium=true): Apply premium gating
   if (isPremium) {
@@ -98,12 +102,14 @@ const ArticlePage = () => {
       showLock = true;
       lockType = 'guest';
       showInlineVisuals = false;
+      canPlayVideo = false;
     } else if (!hasPremiumAccess) {
       // Logged-in but no Premium/trial: show ONLY FIRST PARAGRAPH + logged-in paywall
       visibleContent = [content[0]];
       showLock = true;
       lockType = 'logged-in-no-premium';
       showInlineVisuals = false;
+      canPlayVideo = false;
     }
     // Logged-in with trialing or active: show full content (default)
   }
@@ -125,110 +131,146 @@ const ArticlePage = () => {
     return <p key={index} className="mb-4 leading-relaxed">{text}</p>;
   };
 
+  // Poster image component for video
+  const PosterImage = () => {
+    if (isPlaceholder) {
+      return (
+        <SectionPlaceholder 
+          section={placeholderData.section} 
+          pillar={placeholderData.pillar} 
+          className="w-full h-full"
+        />
+      );
+    }
+    if (coverImage) {
+      return <img src={coverImage} alt={title} className="w-full h-full object-cover" />;
+    }
+    return (
+      <SectionPlaceholder 
+        section={section} 
+        pillar={proPillar} 
+        className="w-full h-full"
+      />
+    );
+  };
+
   return (
     <Layout>
       <div className="container-wide py-8 md:py-12">
         <div className="flex gap-8">
           <article className="flex-1 max-w-3xl mx-auto xl:mx-0">
-        {/* Header */}
-        <header className="mb-8">
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            <Badge className={`text-white border-0 ${getSectionColor(section)}`}>{section}</Badge>
-            <Badge className={getLevelColor(level)}>{level}</Badge>
-            {isPremium && (
-              <Badge className="bg-premium text-premium-foreground">
-                <Crown className="h-3 w-3 mr-1" />Premium
-              </Badge>
+            {/* Header */}
+            <header className="mb-8">
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                {isVideo && (
+                  <Badge className="bg-accent text-accent-foreground">
+                    <Play className="h-3 w-3 mr-1 fill-current" />
+                    VIDEO
+                  </Badge>
+                )}
+                {section !== 'PRO' && (
+                  <Badge className={`text-white border-0 ${getSectionColor(section)}`}>{section}</Badge>
+                )}
+                {(section === 'PRO' || level.toUpperCase() !== section.toUpperCase()) && (
+                  <Badge className={getLevelColor(level)}>{level}</Badge>
+                )}
+                {isPremium && (
+                  <Badge className="bg-premium text-premium-foreground">
+                    <Crown className="h-3 w-3 mr-1" />Premium
+                  </Badge>
+                )}
+                {section === 'PRO' && proPillar && (
+                  <Badge variant="outline" className={getPillarBadgeColor(proPillar)}>
+                    {proPillar}
+                  </Badge>
+                )}
+              </div>
+              
+              <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-4">{title}</h1>
+              
+              <p className="text-xl text-muted-foreground mb-6">{excerpt}</p>
+              
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+                <span>{author}</span>
+                <span>•</span>
+                <time dateTime={publishedAt}>
+                  {new Date(publishedAt).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </time>
+              </div>
+              
+              <AIPulse variant="header" className="mb-6" />
+            </header>
+
+            {/* Video Player or Hero Image */}
+            {isVideo && video ? (
+              <div className="mb-8">
+                {canPlayVideo ? (
+                  <VideoPlayer
+                    video={video}
+                    title={title}
+                    posterImage={<PosterImage />}
+                  />
+                ) : (
+                  <LockedVideoOverlay
+                    posterImage={<PosterImage />}
+                    durationSeconds={video.durationSeconds}
+                  />
+                )}
+              </div>
+            ) : (
+              <div className="rounded-xl overflow-hidden mb-8 aspect-video">
+                <PosterImage />
+              </div>
             )}
-            {section === 'PRO' && proPillar && (
-              <Badge variant="outline" className={getPillarBadgeColor(proPillar)}>
-                {proPillar}
-              </Badge>
+
+            {/* Billboard Ad - after header, before content (only for unlocked content) */}
+            {!showLock && (
+              <div className="mb-8">
+                <AdSlot type="billboard" />
+              </div>
             )}
-          </div>
-          
-          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-4">{title}</h1>
-          
-          <p className="text-xl text-muted-foreground mb-6">{excerpt}</p>
-          
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-            <span>{author}</span>
-            <span>•</span>
-            <time dateTime={publishedAt}>
-              {new Date(publishedAt).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' })}
-            </time>
-          </div>
-          
-          <AIPulse variant="header" className="mb-6" />
-        </header>
 
-        {/* Hero Image */}
-        <div className="rounded-xl overflow-hidden mb-8 aspect-video">
-          {isPlaceholder ? (
-            <SectionPlaceholder 
-              section={placeholderData.section} 
-              pillar={placeholderData.pillar} 
-              className="w-full h-full"
-            />
-          ) : coverImage ? (
-            <img src={coverImage} alt={title} className="w-full h-full object-cover" />
-          ) : (
-            <SectionPlaceholder 
-              section={section} 
-              pillar={proPillar} 
-              className="w-full h-full"
-            />
-          )}
-        </div>
+            {/* Content - for text articles or as description for video */}
+            <div className="prose-magazine">
+              {visibleContent.map((p, i) => {
+                const elements = [renderContent(p, i)];
+                
+                // Insert inline visual after certain paragraphs (for authorized users, text articles only)
+                if (!isVideo && showInlineVisuals && inlineVisuals && inlineVisuals.length > 0) {
+                  if (i === Math.floor(visibleContent.length / 3) && inlineVisuals[0]) {
+                    elements.push(<InlineVisual key={`visual-${0}`} visual={inlineVisuals[0]} index={0} />);
+                  }
+                  if (i === Math.floor(visibleContent.length * 2 / 3) && inlineVisuals[1]) {
+                    elements.push(<InlineVisual key={`visual-${1}`} visual={inlineVisuals[1]} index={1} />);
+                  }
+                }
+                
+                return elements;
+              })}
+              
+              {whatItMeans && section === 'Novinky' && !showLock && (
+                <WhatItMeansBox data={whatItMeans} />
+              )}
+              
+              {showLock && <LockBlock type={lockType} />}
+            </div>
 
-        {/* Billboard Ad - after header, before content */}
-        {!showLock && (
-          <div className="mb-8">
-            <AdSlot type="billboard" />
-          </div>
-        )}
+            {/* Tags */}
+            {!showLock && (
+              <div className="flex flex-wrap gap-2 mt-8 pt-8 border-t border-border">
+                {tags.map(tag => (
+                  <Badge key={tag} variant="outline">{tag}</Badge>
+                ))}
+              </div>
+            )}
 
-        {/* Content */}
-        <div className="prose-magazine">
-          {visibleContent.map((p, i) => {
-            const elements = [renderContent(p, i)];
-            
-            // Insert inline visual after certain paragraphs (for authorized users)
-            if (showInlineVisuals && inlineVisuals && inlineVisuals.length > 0) {
-              if (i === Math.floor(visibleContent.length / 3) && inlineVisuals[0]) {
-                elements.push(<InlineVisual key={`visual-${0}`} visual={inlineVisuals[0]} index={0} />);
-              }
-              if (i === Math.floor(visibleContent.length * 2 / 3) && inlineVisuals[1]) {
-                elements.push(<InlineVisual key={`visual-${1}`} visual={inlineVisuals[1]} index={1} />);
-              }
-            }
-            
-            return elements;
-          })}
-          
-          {whatItMeans && section === 'Novinky' && !showLock && (
-            <WhatItMeansBox data={whatItMeans} />
-          )}
-          
-          {showLock && <LockBlock type={lockType} />}
-        </div>
+            {/* Newsletter */}
+            <div className="mt-12 p-6 bg-secondary rounded-xl">
+              <NewsletterSignup variant="article" />
+            </div>
 
-        {/* Tags */}
-        {!showLock && (
-          <div className="flex flex-wrap gap-2 mt-8 pt-8 border-t border-border">
-            {tags.map(tag => (
-              <Badge key={tag} variant="outline">{tag}</Badge>
-            ))}
-          </div>
-        )}
-
-        {/* Newsletter */}
-        <div className="mt-12 p-6 bg-secondary rounded-xl">
-          <NewsletterSignup variant="article" />
-        </div>
-
-        {/* Recommended */}
-        <RecommendedArticles articles={articles.filter(a => a.section === section)} currentSlug={slug || ''} />
+            {/* Recommended */}
+            <RecommendedArticles articles={articles.filter(a => a.section === section)} currentSlug={slug || ''} />
           </article>
           
           {/* Vertical Ad Sidebar - desktop only */}
