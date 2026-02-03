@@ -48,10 +48,12 @@ const Header = () => {
                 key={item.name}
                 to={item.href}
                 className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  isActive(item.href)
-                    ? 'bg-secondary text-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                } ${item.isPremium ? 'text-premium font-semibold' : ''}`}
+                  item.isPremium
+                    ? 'bg-premium text-premium-foreground hover:bg-premium/90 font-semibold'
+                    : isActive(item.href)
+                      ? 'bg-secondary text-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                }`}
               >
                 {item.isPremium && <Crown className="h-3 w-3 inline mr-1" />}
                 {item.name}
