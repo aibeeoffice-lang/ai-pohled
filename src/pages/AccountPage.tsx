@@ -3,7 +3,7 @@ import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
-import { Crown, Check, X, Settings, AlertTriangle, Clock, Sparkles } from 'lucide-react';
+import { Crown, Check, X, Settings, AlertTriangle, Clock, Sparkles, CreditCard, FileText } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import {
   AlertDialog,
@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { ACCOUNT_PREMIUM, getPriceByPlan } from '@/data/premiumCopy';
 
 const AccountPage = () => {
   const { user, logout, cancelPremium, hasPremiumAccess } = useAuth();
@@ -52,6 +53,19 @@ const AccountPage = () => {
   const isTrialing = user.premiumStatus === 'trialing';
   const isActive = user.premiumStatus === 'active';
   const trialDaysRemaining = isTrialing ? getDaysRemaining(user.trialEndsAt) : 0;
+  const planPrice = getPriceByPlan(user.premiumPlan);
+
+  // Calculate next billing date (for active state)
+  const getNextBillingDate = () => {
+    if (!user.premiumSince) return '-';
+    const since = new Date(user.premiumSince);
+    if (user.premiumPlan === 'annual') {
+      since.setFullYear(since.getFullYear() + 1);
+    } else {
+      since.setMonth(since.getMonth() + 1);
+    }
+    return formatDate(since.toISOString());
+  };
 
   return (
     <Layout>
@@ -68,7 +82,9 @@ const AccountPage = () => {
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-4">
               <Crown className="h-5 w-5 text-premium" />
-              <h2 className="font-display text-xl font-semibold">Premium</h2>
+              <h2 className="font-display text-xl font-semibold">
+                {isTrialing ? ACCOUNT_PREMIUM.trial.title : ACCOUNT_PREMIUM.sectionTitle}
+              </h2>
             </div>
 
             {isTrialing ? (
@@ -76,8 +92,8 @@ const AccountPage = () => {
               <div className="p-6 rounded-xl bg-gradient-to-br from-premium/10 to-premium/5 border border-premium/20">
                 <div className="flex items-center gap-2 mb-4">
                   <Badge className="bg-premium text-premium-foreground">
-                    <Clock className="h-3 w-3 mr-1" />
-                    Trial aktivní
+                    <Check className="h-3 w-3 mr-1" />
+                    {ACCOUNT_PREMIUM.trial.status}
                   </Badge>
                   {user.premiumCancelAtPeriodEnd && (
                     <Badge variant="outline" className="text-orange-600 border-orange-300">
@@ -87,11 +103,8 @@ const AccountPage = () => {
                   )}
                 </div>
 
-                <p className="text-lg font-medium mb-2">
-                  Zbývá {trialDaysRemaining} {trialDaysRemaining === 1 ? 'den' : trialDaysRemaining < 5 ? 'dny' : 'dní'} trialu
-                </p>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Po skončení trialu se spustí platba {user.premiumPlan === 'annual' ? '399 Kč/rok' : '49 Kč/měsíc'}.
+                <p className="text-muted-foreground mb-4">
+                  {ACCOUNT_PREMIUM.trial.text(formatDate(user.trialEndsAt), planPrice)}
                 </p>
 
                 <div className="space-y-2 mb-6">
@@ -109,31 +122,43 @@ const AccountPage = () => {
 
                 {user.premiumCancelAtPeriodEnd ? (
                   <p className="text-sm text-orange-600">
-                    Trial byl zrušen. Premium skončí {formatDate(user.trialEndsAt)}.
+                    {ACCOUNT_PREMIUM.trial.cancelledText(formatDate(user.trialEndsAt))}
                   </p>
                 ) : (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="outline" size="sm">
-                        <X className="h-4 w-4 mr-2" />
-                        Zrušit trial
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Zrušit trial?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Pokud zrušíš, Premium vyprší na konci trialu ({formatDate(user.trialEndsAt)}). Platba se nestrhne.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Zpět</AlertDialogCancel>
-                        <AlertDialogAction onClick={cancelPremium}>
-                          Potvrdit zrušení
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <div className="flex flex-wrap gap-3">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <X className="h-4 w-4 mr-2" />
+                          {ACCOUNT_PREMIUM.trial.buttons.cancel}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>{ACCOUNT_PREMIUM.trial.cancelModal.title}</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {ACCOUNT_PREMIUM.trial.cancelModal.text}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>{ACCOUNT_PREMIUM.trial.cancelModal.cancelCta}</AlertDialogCancel>
+                          <AlertDialogAction onClick={cancelPremium}>
+                            {ACCOUNT_PREMIUM.trial.cancelModal.confirmCta}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    <Button asChild variant="ghost" size="sm">
+                      <Link to="/predplatne">
+                        <Settings className="h-4 w-4 mr-2" />
+                        {ACCOUNT_PREMIUM.trial.buttons.changePlan}
+                      </Link>
+                    </Button>
+                    <Button variant="ghost" size="sm" disabled>
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      {ACCOUNT_PREMIUM.trial.buttons.changePayment}
+                    </Button>
+                  </div>
                 )}
               </div>
             ) : isActive ? (
@@ -142,7 +167,7 @@ const AccountPage = () => {
                 <div className="flex items-center gap-2 mb-4">
                   <Badge className="bg-premium text-premium-foreground">
                     <Check className="h-3 w-3 mr-1" />
-                    Aktivní
+                    {ACCOUNT_PREMIUM.active.status}
                   </Badge>
                   {user.premiumCancelAtPeriodEnd && (
                     <Badge variant="outline" className="text-orange-600 border-orange-300">
@@ -152,7 +177,9 @@ const AccountPage = () => {
                   )}
                 </div>
 
-                <p className="text-lg font-medium mb-4">Máš plný přístup k Premium obsahu.</p>
+                <p className="text-muted-foreground mb-4">
+                  {ACCOUNT_PREMIUM.active.text(getNextBillingDate(), planPrice)}
+                </p>
 
                 <div className="space-y-2 mb-6">
                   <div className="flex justify-between text-sm">
@@ -169,28 +196,28 @@ const AccountPage = () => {
 
                 {user.premiumCancelAtPeriodEnd ? (
                   <p className="text-sm text-orange-600 mb-4">
-                    Premium bylo zrušeno. Přístup poběží do konce zaplaceného období.
+                    {ACCOUNT_PREMIUM.active.cancelledText}
                   </p>
                 ) : (
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-wrap gap-3">
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="outline" size="sm">
                           <X className="h-4 w-4 mr-2" />
-                          Zrušit předplatné
+                          {ACCOUNT_PREMIUM.active.buttons.cancel}
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Zrušit Premium?</AlertDialogTitle>
+                          <AlertDialogTitle>{ACCOUNT_PREMIUM.active.cancelModal.title}</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Po zrušení budeš mít přístup k Premium článkům do konce zaplaceného období. Poté se přístup deaktivuje.
+                            {ACCOUNT_PREMIUM.active.cancelModal.text}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Zpět</AlertDialogCancel>
+                          <AlertDialogCancel>{ACCOUNT_PREMIUM.active.cancelModal.cancelCta}</AlertDialogCancel>
                           <AlertDialogAction onClick={cancelPremium}>
-                            Potvrdit zrušení
+                            {ACCOUNT_PREMIUM.active.cancelModal.confirmCta}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -198,8 +225,16 @@ const AccountPage = () => {
                     <Button asChild variant="ghost" size="sm">
                       <Link to="/predplatne">
                         <Settings className="h-4 w-4 mr-2" />
-                        Změnit plán
+                        {ACCOUNT_PREMIUM.active.buttons.changePlan}
                       </Link>
+                    </Button>
+                    <Button variant="ghost" size="sm" disabled>
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      {ACCOUNT_PREMIUM.active.buttons.changePayment}
+                    </Button>
+                    <Button variant="ghost" size="sm" disabled>
+                      <FileText className="h-4 w-4 mr-2" />
+                      {ACCOUNT_PREMIUM.active.buttons.invoices}
                     </Button>
                   </div>
                 )}
@@ -208,15 +243,15 @@ const AccountPage = () => {
               // No premium
               <div className="p-6 rounded-xl bg-secondary border border-border">
                 <div className="flex items-center gap-2 mb-4">
-                  <Badge variant="outline">Neaktivní</Badge>
+                  <Badge variant="outline">{ACCOUNT_PREMIUM.none.status}</Badge>
                 </div>
                 <p className="text-muted-foreground mb-6">
-                  Premium ti dá přístup k hloubkovým článkům, grafům a checklistům. Spusť 14denní trial zdarma.
+                  {ACCOUNT_PREMIUM.none.text}
                 </p>
                 <Button asChild className="bg-premium hover:bg-premium/90">
                   <Link to="/predplatne">
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Spustit 14denní trial
+                    {ACCOUNT_PREMIUM.none.cta}
                   </Link>
                 </Button>
               </div>
