@@ -16,6 +16,7 @@ const navigation = [
   { name: 'Návody', href: '/navody' },
   { name: 'Nástroje', href: '/nastroje' },
   { name: 'AI v práci', href: '/ai-v-praci' },
+  { name: 'Slovník AI', href: '/slovnik' },
   { name: 'PRO', href: '/pro' },
   { name: 'Premium', href: '/predplatne', isPremium: true },
 ];
