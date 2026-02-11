@@ -53,6 +53,11 @@ const Footer = () => {
                   PRO
                 </Link>
               </li>
+              <li>
+                <Link to="/slovnik" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+                  Slovník AI
+                </Link>
+              </li>
             </ul>
           </div>
 

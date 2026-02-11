@@ -16,6 +16,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import GlossaryPage from "./pages/GlossaryPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/newsletter" element={<NewsletterPage />} />
             <Route path="/o-nas" element={<AboutPage />} />
             <Route path="/kontakt" element={<ContactPage />} />
+            <Route path="/slovnik" element={<GlossaryPage />} />
             <Route path="/clanek/:slug" element={<ArticlePage />} />
             <Route path="/:section" element={<SectionPage />} />
             <Route path="*" element={<NotFound />} />
