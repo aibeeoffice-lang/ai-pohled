@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import NotFound from '@/pages/NotFound';
 import Layout from '@/components/layout/Layout';
 import ArticleCard from '@/components/ArticleCard';
 import ArticleFilters from '@/components/ArticleFilters';
@@ -22,26 +23,9 @@ const SectionPage = () => {
   const [selectedPillar, setSelectedPillar] = useState<ProPillar | 'all'>('all');
   const [videoOnly, setVideoOnly] = useState(false);
 
-  // If not a valid section slug, check if it's a special page route
+  // If not a valid section slug, render NotFound
   if (!sectionConfig) {
-    const specialRoutes = ['prihlaseni', 'ucet', 'newsletter', 'clanek'];
-    if (sectionSlug && specialRoutes.some(r => sectionSlug.startsWith(r))) {
-      return <Navigate to={`/${sectionSlug}`} replace />;
-    }
-    
-    return (
-      <Layout>
-        <div className="container-wide py-16 text-center">
-          <h1 className="font-display text-2xl font-bold mb-4">Sekce nenalezena</h1>
-          <p className="text-muted-foreground mb-4">
-            Hledaná sekce "{sectionSlug}" neexistuje.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Dostupné sekce: {SECTIONS.map(s => s.slug).join(', ')}
-          </p>
-        </div>
-      </Layout>
-    );
+    return <NotFound />;
   }
 
   const section = sectionConfig.sectionKey;
